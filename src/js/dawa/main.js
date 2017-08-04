@@ -248,6 +248,11 @@ searchInput.addEventListener('input', () => {
   while (resultList.firstChild) { resultList.removeChild(resultList.firstChild); }
   if (searchInput.value.length > 2) {
     searchTimeout = setTimeout(() => {
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Path) {
+          map.removeLayer(layer);
+        }
+      });
       searchAll(
         searchInput.value,
         resultList,
