@@ -24,15 +24,12 @@ const dawa = (function dawa() { // eslint-disable-line
         if (xhr.status === 200) {
           try {
             const reply = JSON.parse(xhr.responseText);
-            console.log(theme, reply);
             if (reply.length === 0) {
               callback(false, false);
             } else {
-              console.log('send: ', reply);
               callback(false, reply);
             }
           } catch (err) {
-            console.log(err);
             callback('Error parsing DAWA JSON!', err);
           }
         } else {
@@ -50,29 +47,31 @@ const dawa = (function dawa() { // eslint-disable-line
         if (reply) {
           for (let j = 0; j < reply.length; j += 1) {
             const resultText = document.createElement('p');
-            resultText.className = 'resultText';
+            const resultIcon = document.createElement('p');
             const result = document.createElement('li');
             result.className = 'result';
             result.setAttribute('type', themes[i]);
+            resultText.className = 'resultText';
+            resultIcon.className = 'resultIcon';
 
             if (themes[i] === 'postnumre') {
               result.setAttribute('externalID', reply[j].postnummer.nr);
               resultText.innerHTML = `${reply[j].postnummer.navn} (${reply[j].postnummer.nr})`;
+              resultIcon.innerHTML = '..Postnummer';
             } else if (themes[i] === 'adgangsadresser') {
-              console.log(reply[j]);
               resultText.innerHTML = reply[j].tekst;
               result.setAttribute('externalID', reply[j].adgangsadresse.href);
+              resultIcon.innerHTML = '..Adresse';
             } else if (themes[i] === 'kommuner') {
               resultText.innerHTML = reply[j].kommune.navn;
               result.setAttribute('externalID', reply[j].kommune.kode);
+              resultIcon.innerHTML = '..Kommune';
             } else if (themes[i] === 'supplerendebynavne') {
               result.setAttribute('externalID', reply[j].supplerendebynavn.href);
+              resultIcon.innerHTML = '..SupBynavn';
               resultText.innerHTML = reply[j].supplerendebynavn.navn;
             }
 
-            const resultIcon = document.createElement('p');
-            resultIcon.className = 'resultIcon';
-            resultIcon.innerHTML = `(${themes[i]})`;
 
             result.appendChild(resultText);
             result.appendChild(resultIcon);
@@ -111,39 +110,43 @@ const dawa = (function dawa() { // eslint-disable-line
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
-          const polygons = xmlDoc.getElementsByTagName('geometri');
-          const polygonsGeo = [];
+          try {
+            const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
+            const polygons = xmlDoc.getElementsByTagName('geometri');
+            const polygonsGeo = [];
 
-          for (let j = 0; j < polygons.length; j += 1) {
-            const thisHolder = [];
-            const thisPolygon = polygons[j].getElementsByTagName('coordinates')[0].innerHTML.split(' ');
-            for (let i = 0; i < thisPolygon.length; i += 1) {
-              const coords = thisPolygon[i].split(',').splice(0, 2).reverse();
-              thisHolder.push([Number(coords[0]), Number(coords[1])]);
+            for (let j = 0; j < polygons.length; j += 1) {
+              const thisHolder = [];
+              const thisPolygon = polygons[j].getElementsByTagName('coordinates')[0].innerHTML.split(' ');
+              for (let i = 0; i < thisPolygon.length; i += 1) {
+                const coords = thisPolygon[i].split(',').splice(0, 2).reverse();
+                thisHolder.push([Number(coords[0]), Number(coords[1])]);
+              }
+              polygonsGeo.push(thisHolder);
             }
-            polygonsGeo.push(thisHolder);
+
+            const geojson = {
+              type: 'FeatureCollection',
+              features: [],
+            };
+
+            for (let w = 0; w < polygonsGeo.length; w += 1) {
+              geojson.features.push({
+                type: 'Feature',
+                geometry: {
+                  type: 'Polygon',
+                  coordinates: [polygonsGeo[w]],
+                },
+              });
+            }
+
+            callback(false, geojson);
+          } catch (err) {
+            console.log(err);
+            callback('Error parsing geometry from kortforsyningen.');
           }
-
-          const geojson = {
-            type: 'FeatureCollection',
-            features: [],
-          };
-
-          for (let w = 0; w < polygonsGeo.length; w += 1) {
-            geojson.features.push({
-              type: 'Feature',
-              geometry: {
-                type: 'Polygon',
-                coordinates: [polygonsGeo[w]],
-              },
-            },
-          );
-          }
-
-          callback(false, geojson);
         } else {
-          callback(true, `Error getting featureInfo (status: ${xhr.status})`);
+          callback(`Error getting featureInfo (status: ${xhr.status})`);
         }
       }
     };
@@ -155,8 +158,10 @@ const dawa = (function dawa() { // eslint-disable-line
         style: {
           fillOpacity: 0,
           dashArray: '10, 5',
+          color: '#f2932f',
         },
       }).addTo(map);
+
       map.flyToBounds(_geom.getBounds(), { maxZoom: 15 });
     } else {
       throw Error('No leaflet installation found.');
@@ -238,8 +243,8 @@ const dawa = (function dawa() { // eslint-disable-line
     if (map && L) {
       const searchContainer = document.getElementById(div);
       const resultList = document.createElement('ul');
-      resultList.id = 'resultsHolder';
       const searchInput = document.createElement('input');
+      resultList.id = 'resultsHolder';
       searchInput.type = 'text';
       searchInput.className = 'search-input';
       searchInput.placeholder = 'Søg efter adresser, kommuner mm.';
@@ -259,6 +264,60 @@ const dawa = (function dawa() { // eslint-disable-line
       });
       searchContainer.appendChild(searchInput);
       searchContainer.appendChild(resultList);
+
+      window.onkeydown = function keyListen(e) {
+        if (searchInput === document.activeElement) {
+          const code = e.keyCode ? e.keyCode : e.which;
+          if (code === 27) {
+            searchInput.value = '';
+            clearChildren(resultList);
+          }
+          if (resultList.children.length !== 0) {
+            if (code === 40 || code === 38) {
+              const selected = document.getElementsByClassName('result selected');
+
+              // If empty make the first child selected
+              if (selected.length === 0) {
+                resultList.firstChild.classList.add('selected');
+              } else {
+                // get the index of the selected value
+                let counter;
+                for (let i = 0; i < resultList.children.length; i += 1) {
+                  if (resultList.children[i].classList.contains('selected')) {
+                    counter = i;
+                    break;
+                  }
+                }
+
+                const listLength = document.getElementsByClassName('result').length;
+
+                if (code === 40) {
+                  // If we are not at the end of the list
+                  if (counter !== listLength - 1) {
+                    // remove selected class from current
+                    selected[0].classList.remove('selected');
+                    // add to the next one in the listLength
+                    resultList.children[counter + 1].classList.add('selected');
+                  }
+                } else if (counter !== 0) { // If we are not at the start of the list
+                    // remove selected class from current
+                  selected[0].classList.remove('selected');
+                    // add to the next one in the listLength
+                  resultList.children[counter - 1].classList.add('selected');
+                }
+              }
+            } else if (code === 13) {
+              // if list not empty
+              const selected = document.getElementsByClassName('result selected');
+              if (selected.length !== 0) {
+                searchInput.value = selected[0].firstChild.innerHTML;
+                selected[0].click();
+                clearChildren(resultList);
+              }
+            }
+          }
+        }
+      };
     } else {
       throw Error('Leaflet not defined.');
     }
