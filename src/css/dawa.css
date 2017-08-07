@@ -28,10 +28,6 @@
   border: none;
 }
 
-{
-  background: rgba(78, 120, 140, 0.9);
-}
-
 #resultsHolder{
   background: rgba(30, 32, 40, 0.85);
   list-style-type: none;

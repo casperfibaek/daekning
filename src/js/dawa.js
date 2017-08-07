@@ -9,6 +9,12 @@ const dawa = (function dawa() { // eslint-disable-line
   const _config = {
     themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
     replies: 3,
+    style: {
+      fillOpacity: 0,
+      dashArray: '10, 5',
+      color: '#f2932f',
+      // radius: 50,
+    },
   };
 
   function getHits(theme, searchString, callback, replies = 3) {
@@ -152,25 +158,29 @@ const dawa = (function dawa() { // eslint-disable-line
     };
   }
 
-  function leafletAdd(map, geom) {
+  function leafletAdd(map, geom, style) {
     if (L && L.geoJSON) {
-      const _geom = L.geoJSON(geom, {
-        style: {
-          fillOpacity: 0,
-          dashArray: '10, 5',
-          color: '#f2932f',
-        },
-      }).addTo(map);
-
+      const _geom = L.geoJSON(geom, { style });
+      map.once('moveend', () => { _geom.addTo(map); });
       map.flyToBounds(_geom.getBounds(), { maxZoom: 15 });
     } else {
       throw Error('No leaflet installation found.');
     }
   }
 
-  function leafletAddCoords(map, geom) {
-    const coords = geom.adgangspunkt.koordinater.reverse();
-    map.flyToBounds(L.latLng(coords).toBounds(100), { maxZoom: 15 });
+  function leafletAddCoords(map, geom, style) {
+    if (L && L.geoJSON) {
+      const coords = geom.adgangspunkt.koordinater.reverse();
+      const _geom = L.circle(coords, {
+        radius: 40,
+        fillOpacity: style.fillOpacity,
+        color: style.color,
+      });
+      map.once('moveend', () => { _geom.addTo(map); });
+      map.flyToBounds(L.latLng(coords).toBounds(40), { maxZoom: 15 });
+    } else {
+      throw Error('No leaflet installation found.');
+    }
   }
 
   function clearChildren(div) {
@@ -183,17 +193,17 @@ const dawa = (function dawa() { // eslint-disable-line
     });
   }
 
-  function addGeom(type, externalID, resultList, map) {
+  function addGeom(type, externalID, resultList, map, style) {
     if (type === 'kommuner') {
       getGeom('KOMMUNE2000', 'CPR_noegle', externalID, (err, reply) => {
         if (err) { throw Error(err); }
-        leafletAdd(map, reply);
+        leafletAdd(map, reply, style);
         clearChildren(resultList);
       });
     } else if (type === 'postnumre') {
       getGeom('POSTDISTRIKT2000', 'PostCodeToID', externalID, (err, reply) => {
         if (err) { throw Error(err); }
-        leafletAdd(map, reply);
+        leafletAdd(map, reply, style);
         clearChildren(resultList);
       });
     } else if (type === 'adgangsadresser') {
@@ -205,9 +215,9 @@ const dawa = (function dawa() { // eslint-disable-line
           if (xhr.status === 200) {
             try {
               const reply = JSON.parse(xhr.responseText);
-              leafletAddCoords(map, reply);
+              leafletAddCoords(map, reply, style);
               clearChildren(resultList);
-            } catch (err) { throw Error('Error parsing DAWA JSON.'); }
+            } catch (err) { console.log(err); throw Error('Error parsing DAWA JSON.'); }
           } else {
             throw Error(`${externalID} replied: ${xhr.status}`);
           }
@@ -225,7 +235,7 @@ const dawa = (function dawa() { // eslint-disable-line
               const postCode = reply.postnumre[0].nr;
               getGeom('POSTDISTRIKT2000', 'PostCodeToID', postCode, (err, secondReply) => {
                 if (err) { throw Error(err); }
-                leafletAdd(map, secondReply);
+                leafletAdd(map, secondReply, style);
                 clearChildren(resultList);
               });
             } catch (err) { throw Error('Error parsing DAWA JSON.'); }
@@ -257,7 +267,7 @@ const dawa = (function dawa() { // eslint-disable-line
           searchTimeout = setTimeout(() => {
             search(searchInput.value, config.themes, resultList, (e) => {
               const target = e.target.attributes;
-              addGeom(target.type.value, target.externalID.value, resultList, map);
+              addGeom(target.type.value, target.externalID.value, resultList, map, config.style);
             }, config.replies);
           }, 500);
         }

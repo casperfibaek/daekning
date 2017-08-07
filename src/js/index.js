@@ -5,7 +5,7 @@
 const map = L.map('map', {
   zoomControl: false,
   doubleClickZoom: false,
-  maxZoom: 19,
+  maxZoom: 17,
   minZoom: 7,
 })
 .setView([56.17919, 10.53588], 7);
@@ -113,7 +113,6 @@ map
         }
       }
     };
-    // }
   });
 
 dawa('searchContainer', map);
