@@ -1,4 +1,5 @@
 module.exports = function build(grunt) {
+  require('load-grunt-tasks')(grunt); // eslint-disable-line
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     copy: {
@@ -25,9 +26,7 @@ module.exports = function build(grunt) {
         stripBanners: true,
       },
       dist: {
-        src: ['temp/config.js',
-          'temp/map.js', 'temp/init.js',
-          'temp/dawa/connections.js', 'temp/dawa/main.js'],
+        src: ['temp/config.js', 'temp/dawa.js', 'temp/index.js'],
         dest: 'build/js/app.js',
       },
     },
@@ -73,5 +72,4 @@ module.exports = function build(grunt) {
   // Default task(s).
   grunt.registerTask('test', ['copy']);
   grunt.registerTask('default', ['copy', 'babel', 'concat', 'uglify', 'cssmin', 'clean']);
-  require('load-grunt-tasks')(grunt); // eslint-disable-line
 };
