@@ -109,9 +109,20 @@ td.table-title{
   color: whitesmoke;
 }
 
-/*.leaflet-bar a.leaflet-disabled {
-  background-color
-}*/
+.customControl{
+  width: 180px;
+  margin-bottom: -20px;
+}
+
+.layerHeading{
+  margin: 0;
+  padding-left: 4px;
+  padding-bottom: 2px;
+}
+
+.layerImg{
+  margin-bottom: -2px;
+}
 
 #container{
   display: flex;

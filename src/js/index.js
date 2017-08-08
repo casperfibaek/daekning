@@ -10,29 +10,28 @@ const map = L.map('map', {
 })
 .setView([56.17919, 10.53588], 7);
 
-L.control.layers(
-  /* --- Baselayers --- */
-  {
-    OpenStreetMap: L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }),
-    'OpenStreetMap BW': L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(map),
-    Flyfoto: L.tileLayer.wms('http://kortforsyningen.kms.dk/service?servicename=orto_foraar&client=QGIS&request=GetCapabilities&service=WMS&version=1.1.1&LOGIN=qgisdk&PASSWORD=qgisdk', {
-      maxZoom: 19,
-      layers: 'orto_foraar',
-    }),
-  },
+// First we add the basemaps.
+L.control.layers({
+  OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }),
+  'OpenStreetMap BW': L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map),
+  Flyfoto: L.tileLayer.wms('https://kortforsyningen.kms.dk/service?servicename=orto_foraar&client=QGIS&request=GetCapabilities&service=WMS&version=1.1.1&LOGIN=qgisdk&PASSWORD=qgisdk', {
+    maxZoom: 19,
+    layers: 'orto_foraar',
+  }),
+},
   /* --- Overlays --- */
   {
     // ...
   },
   /* --- options --- */
   {
-    collapsed: false,
+    collapsed: true,
     position: 'topleft',
   }).addTo(map);
 
@@ -78,7 +77,7 @@ map
   .on('click', (e) => {
     const lat = e.latlng.lat;
     const lng = e.latlng.lng;
-    const url = `http://daekning.telia.dk/TelNetMap_Main_Tile/Default/GetWmsFeatureInfo?wmsUrl=${
+    const url = `https://daekning.telia.dk/TelNetMap_Main_Tile/Default/GetWmsFeatureInfo?wmsUrl=${
         encodeURIComponent('http://81.236.57.77/telnetmap_ext_services/kortinfo/Services/WMS.ashx?page=TeleWMS&Site=TS_DK&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=16549&BBOX=')
         }${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
 
@@ -125,50 +124,63 @@ const getTicket = function getTicket(callback) {
   xhr.onreadystatechange = function onreadystatechange() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
-        const response = xhr.responseText;
-        callback(response);
+        callback(false, xhr.responseText.replace(/"/g, ''));
       } else {
-        console.log(`Error getting ticket (status: ${xhr.status})`);
+        callback(`Error getting ticket (status: ${xhr.status})`);
       }
     }
   };
 };
 
-getTicket((ticket) => {
-  const outdoorSpeedControl = L.control.layers({}, {}, {
-    collapsed: false,
-    position: 'topright',
-  }).addTo(map);
-  const outdoorSpeedGroup = L.layerGroup();
+const nirasTiles = function nirasTiles(ticket, config, addToGroup) {
+  const tiles = L.tileLayer('http://81.236.57.77/Telnetmap_TileService/GetTile.ashx?' +
+      `Ticket=${ticket}&` +
+      `LayerName=${config.name}&` +
+      'Level={z}&' +
+      'X={x}&' +
+      'Y={y}',
+    {
+      maxZoom: 19,
+      maxNativeZoom: 14,
+      minZoom: 7,
+    },
+  );
 
-  const nirasTiles = function nirasTiles(config, addToGroup) {
-    const tiles = L.tileLayer('http://81.236.57.77/Telnetmap_TileService/GetTile.ashx?' +
-        `Ticket=${ticket.replace(/"/g, '')}&` +
-        `LayerName=${config.name}&` +
-        'Level={z}&' +
-        'X={x}&' +
-        'Y={y}',
-      {
-        maxZoom: 19,
-        maxNativeZoom: 14,
-        minZoom: 7,
-      });
-    if (config.default && config.default === true) { tiles.addTo(map); }
+  if (config.default && config.default === true) { tiles.addTo(map); }
 
-    addToGroup.addLayer(tiles);
-    return tiles;
-  };
+  addToGroup.addLayer(tiles);
+  return tiles;
+};
 
-  for (let i = 0; i < _config.layers.length; i += 1) {
-    const img = (_config.layers[i].image !== null) ?
-      `<img src="${_config.layers[i].image}"/>` : '';
 
-    outdoorSpeedControl.addBaseLayer(
-        nirasTiles(_config.layers[i], outdoorSpeedGroup), `${img}  ${_config.layers[i].text}`);
+getTicket((err, reply) => {
+  if (err) { throw Error(err); }
+  if (_config.layerGroups.length !== 0) {
+    const layerGroup = L.layerGroup();
+
+    for (let i = 0; i < _config.layerGroups.length; i += 1) {
+      const customControl = L.control.layers({}, {}, {
+        collapsed: false,
+        position: 'topright',
+      }).addTo(map);
+      const container = customControl.getContainer();
+      container.classList.add('customControl');
+      const curr = _config.layerGroups[i];
+      const heading = document.createElement('h4');
+      heading.innerHTML = curr.layername;
+      heading.classList.add('layerHeading');
+      container.prepend(heading);
+
+      for (let j = 0; j < curr.layers.length; j += 1) {
+        const img = (curr.layers[j].image !== null) ?
+          `<img src="${curr.layers[j].image}" alt="${curr.layers[j].text}" class="layerImg"/>` : '';
+        customControl.addBaseLayer(
+          nirasTiles(reply, curr.layers[j], layerGroup), `${img}  ${curr.layers[j].text}`);
+      }
+    }
+    layerGroup.setZIndex(201);
+    layerGroup.eachLayer((layer) => {
+      layer.setOpacity(0.5);
+    });
   }
-
-  outdoorSpeedGroup.setZIndex(201);
-  outdoorSpeedGroup.eachLayer((layer) => {
-    layer.setOpacity(0.5);
-  });
 });

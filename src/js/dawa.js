@@ -4,7 +4,8 @@
 
 const dawa = (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
-  // possible themes: postnumre, vejnavne, adgangsadresser, kommuner, supplerendebynavne
+  // possible themes: postnumre, vejnavne
+  // adgangsadresser, kommuner, supplerendebynavne
 
   const _config = {
     themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
@@ -13,7 +14,6 @@ const dawa = (function dawa() { // eslint-disable-line
       fillOpacity: 0,
       dashArray: '10, 5',
       color: '#f2932f',
-      // radius: 50,
     },
   };
 
@@ -22,9 +22,8 @@ const dawa = (function dawa() { // eslint-disable-line
         `&noformat&per_side=${replies}`;
 
     const xhr = new XMLHttpRequest();
+
     xhr.open('GET', url); xhr.send(null);
-    xhr.onerror = function onerror(err) { callback(err); };
-      // If the search input is manipulated, fire xhr.abort();
     xhr.onreadystatechange = function onreadystatechange() {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
@@ -39,13 +38,12 @@ const dawa = (function dawa() { // eslint-disable-line
             callback('Error parsing DAWA JSON!', err);
           }
         } else {
-          callback(`During the autocomplete routine the URL: ${url} replied: ${xhr.status}`);
+          callback(`Autocomplete routine @${url} replied: ${xhr.status}`);
         }
       }
     };
   }
 
-  // TODO: Move resultList to other funtion. return instead.
   function search(searchTerm, themes, resultList, onClick, replies = 3) {
     for (let i = 0; i < themes.length; i += 1) {
       getHits(themes[i], searchTerm, (err, reply) => {
@@ -62,7 +60,7 @@ const dawa = (function dawa() { // eslint-disable-line
 
             if (themes[i] === 'postnumre') {
               result.setAttribute('externalID', reply[j].postnummer.nr);
-              resultText.innerHTML = `${reply[j].postnummer.navn} (${reply[j].postnummer.nr})`;
+              resultText.innerHTML = `${reply[j].postnummer.navn}, ${reply[j].postnummer.nr}`;
               resultIcon.innerHTML = '..Postnummer';
             } else if (themes[i] === 'adgangsadresser') {
               resultText.innerHTML = reply[j].tekst;
@@ -73,11 +71,11 @@ const dawa = (function dawa() { // eslint-disable-line
               result.setAttribute('externalID', reply[j].kommune.kode);
               resultIcon.innerHTML = '..Kommune';
             } else if (themes[i] === 'supplerendebynavne') {
-              result.setAttribute('externalID', reply[j].supplerendebynavn.href);
-              resultIcon.innerHTML = '..SupBynavn';
+              result.setAttribute('externalID',
+                reply[j].supplerendebynavn.href);
+              resultIcon.innerHTML = '..Bynavn';
               resultText.innerHTML = reply[j].supplerendebynavn.navn;
             }
-
 
             result.appendChild(resultText);
             result.appendChild(resultIcon);
@@ -110,7 +108,9 @@ const dawa = (function dawa() { // eslint-disable-line
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url); xhr.send(null);
-    xhr.onerror = function onerror() { throw new Error('Error getting geometry.'); };
+    xhr.onerror = function onerror() {
+      throw new Error('Error getting geometry.');
+    };
 
     xhr.onreadystatechange = function onreadystatechange() {
       if (xhr.readyState === 4) {
@@ -118,12 +118,15 @@ const dawa = (function dawa() { // eslint-disable-line
           const parser = new DOMParser();
           try {
             const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
-            const polygons = xmlDoc.getElementsByTagName('geometri');
+            const polygons = xmlDoc.getElementsByTagName('kms:geometri');
             const polygonsGeo = [];
 
             for (let j = 0; j < polygons.length; j += 1) {
               const thisHolder = [];
-              const thisPolygon = polygons[j].getElementsByTagName('coordinates')[0].innerHTML.split(' ');
+              const thisPolygon = polygons[j]
+                .getElementsByTagName('gml:coordinates')[0]
+                .innerHTML
+                .split(' ');
               for (let i = 0; i < thisPolygon.length; i += 1) {
                 const coords = thisPolygon[i].split(',').splice(0, 2).reverse();
                 thisHolder.push([Number(coords[0]), Number(coords[1])]);
@@ -148,7 +151,6 @@ const dawa = (function dawa() { // eslint-disable-line
 
             callback(false, geojson);
           } catch (err) {
-            console.log(err);
             callback('Error parsing geometry from kortforsyningen.');
           }
         } else {
@@ -159,28 +161,24 @@ const dawa = (function dawa() { // eslint-disable-line
   }
 
   function leafletAdd(map, geom, style) {
-    if (L && L.geoJSON) {
-      const _geom = L.geoJSON(geom, { style });
-      map.once('moveend', () => { _geom.addTo(map); });
-      map.flyToBounds(_geom.getBounds(), { maxZoom: 15 });
-    } else {
-      throw Error('No leaflet installation found.');
-    }
+    const _geom = L.geoJSON(geom, {
+      style,
+    });
+    map.once('moveend', () => { _geom.addTo(map); });
+    map.flyToBounds(_geom.getBounds(), {
+      maxZoom: 15,
+    });
   }
 
   function leafletAddCoords(map, geom, style) {
-    if (L && L.geoJSON) {
-      const coords = geom.adgangspunkt.koordinater.reverse();
-      const _geom = L.circle(coords, {
-        radius: 40,
-        fillOpacity: style.fillOpacity,
-        color: style.color,
-      });
-      map.once('moveend', () => { _geom.addTo(map); });
-      map.flyToBounds(L.latLng(coords).toBounds(40), { maxZoom: 15 });
-    } else {
-      throw Error('No leaflet installation found.');
-    }
+    const coords = geom.adgangspunkt.koordinater.reverse();
+    const _geom = L.circle(coords, {
+      radius: 40,
+      fillOpacity: style.fillOpacity,
+      color: style.color,
+    });
+    map.once('moveend', () => { _geom.addTo(map); });
+    map.flyToBounds(L.latLng(coords).toBounds(40), { maxZoom: 15 });
   }
 
   function clearChildren(div) {
@@ -217,7 +215,7 @@ const dawa = (function dawa() { // eslint-disable-line
               const reply = JSON.parse(xhr.responseText);
               leafletAddCoords(map, reply, style);
               clearChildren(resultList);
-            } catch (err) { console.log(err); throw Error('Error parsing DAWA JSON.'); }
+            } catch (err) { throw Error('Error parsing DAWA JSON.'); }
           } else {
             throw Error(`${externalID} replied: ${xhr.status}`);
           }
@@ -226,7 +224,6 @@ const dawa = (function dawa() { // eslint-disable-line
     } else if (type === 'supplerendebynavne') {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', externalID); xhr.send(null);
-      xhr.onerror = function onerror() { throw new Error('Error getting city name information.'); };
       xhr.onreadystatechange = function onreadystatechange() {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
@@ -257,6 +254,7 @@ const dawa = (function dawa() { // eslint-disable-line
       resultList.id = 'resultsHolder';
       searchInput.type = 'text';
       searchInput.className = 'search-input';
+      searchInput.setAttribute('aria-label', 'search');
       searchInput.placeholder = 'Søg efter adresser, kommuner mm.';
       let searchTimeout;
       searchInput.addEventListener('input', () => {
@@ -285,12 +283,9 @@ const dawa = (function dawa() { // eslint-disable-line
           if (resultList.children.length !== 0) {
             if (code === 40 || code === 38) {
               const selected = document.getElementsByClassName('result selected');
-
-              // If empty make the first child selected
               if (selected.length === 0) {
                 resultList.firstChild.classList.add('selected');
               } else {
-                // get the index of the selected value
                 let counter;
                 for (let i = 0; i < resultList.children.length; i += 1) {
                   if (resultList.children[i].classList.contains('selected')) {
@@ -302,22 +297,16 @@ const dawa = (function dawa() { // eslint-disable-line
                 const listLength = document.getElementsByClassName('result').length;
 
                 if (code === 40) {
-                  // If we are not at the end of the list
                   if (counter !== listLength - 1) {
-                    // remove selected class from current
                     selected[0].classList.remove('selected');
-                    // add to the next one in the listLength
                     resultList.children[counter + 1].classList.add('selected');
                   }
-                } else if (counter !== 0) { // If we are not at the start of the list
-                    // remove selected class from current
+                } else if (counter !== 0) {
                   selected[0].classList.remove('selected');
-                    // add to the next one in the listLength
                   resultList.children[counter - 1].classList.add('selected');
                 }
               }
             } else if (code === 13) {
-              // if list not empty
               const selected = document.getElementsByClassName('result selected');
               if (selected.length !== 0) {
                 searchInput.value = selected[0].firstChild.innerHTML;
