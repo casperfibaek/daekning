@@ -4,10 +4,11 @@ const _config = {
   layerGroups: [
     {
       layername: 'Datahastighed - Udendørs',
+      defaultOpen: true,
       layers: [{
           name: '3G4G_speed_outdoor_all_MapTiler',
           text: 'Udenfor alle',
-          image: null,
+          image: false,
           default: true,
         },{
           name: '3G4G_speed_outdoor_200Mbit_MapTiler',
@@ -45,7 +46,7 @@ const _config = {
       layers: [{
           name: '3G4G_speed_indoor_all_MapTiler',
           text: 'Indenfor alle',
-          image: null,
+          image: false,
         },{
           name: '3G4G_speed_indoor_200Mbit_MapTiler',
           text: 'Indenfor 100-200 mbits/s',
@@ -82,7 +83,7 @@ const _config = {
       layers: [{
           name: 'All_outdoor_MapTiler',
           text: 'Udenfor alle',
-          image: null,
+          image: false,
         },{
           name: '4G_outdoor_Maptiler',
           text: '4G Udenfor',
@@ -103,7 +104,7 @@ const _config = {
       layers: [{
           name: 'All_indoor_MapTiler',
           text: 'Indenfor alle',
-          image: null,
+          image: false,
         },{
           name: '4G_outdoor_Maptiler',
           text: '4G Indenfor',

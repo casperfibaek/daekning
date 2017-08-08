@@ -73,46 +73,46 @@ map
   .on('zoomend', () => {
     document.getElementsByClassName('leaflet-control-zoom-in')[0].style.background = '#1e2028';
     document.getElementsByClassName('leaflet-control-zoom-out')[0].style.background = '#1e2028';
-  })
-  .on('click', (e) => {
-    const lat = e.latlng.lat;
-    const lng = e.latlng.lng;
-    const url = `https://daekning.telia.dk/TelNetMap_Main_Tile/Default/GetWmsFeatureInfo?wmsUrl=${
-        encodeURIComponent('http://81.236.57.77/telnetmap_ext_services/kortinfo/Services/WMS.ashx?page=TeleWMS&Site=TS_DK&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=16549&BBOX=')
-        }${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.send(null);
-
-    xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-
-          let table = '<table>';
-
-          for (let i = 0; i < response.length; i += 1) {
-            table += '<tr>';
-            table += `<td class="table-title">${response[i].split(':')[0]}</td>`;
-            table += `<td>${response[i].split(':')[1]}</td>`;
-            table += '</tr>';
-          }
-
-          table += '</table>';
-
-          if (response.length > 0) {
-            L.popup()
-                .setLatLng(e.latlng)
-                .setContent(table)
-                .openOn(map);
-          }
-        } else {
-          console.log(`Error getting featureInfo (status: ${xhr.status})`);
-        }
-      }
-    };
   });
+  // .on('click', (e) => {
+  //   const lat = e.latlng.lat;
+  //   const lng = e.latlng.lng;
+  //   const url = `https://daekning.telia.dk/TelNetMap_Main_Tile/Default/GetWmsFeatureInfo?wmsUrl=${
+  //       encodeURIComponent('http://81.236.57.77/telnetmap_ext_services/kortinfo/Services/WMS.ashx?page=TeleWMS&Site=TS_DK&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=16549&BBOX=')
+  //       }${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
+  //
+  //   const xhr = new XMLHttpRequest();
+  //   xhr.open('GET', url);
+  //   xhr.send(null);
+  //
+  //   xhr.onreadystatechange = function onreadystatechange() {
+  //     if (xhr.readyState === 4) {
+  //       if (xhr.status === 200) {
+  //         const response = JSON.parse(xhr.responseText);
+  //
+  //         let table = '<table>';
+  //
+  //         for (let i = 0; i < response.length; i += 1) {
+  //           table += '<tr>';
+  //           table += `<td class="table-title">${response[i].split(':')[0]}</td>`;
+  //           table += `<td>${response[i].split(':')[1]}</td>`;
+  //           table += '</tr>';
+  //         }
+  //
+  //         table += '</table>';
+  //
+  //         if (response.length > 0) {
+  //           L.popup()
+  //               .setLatLng(e.latlng)
+  //               .setContent(table)
+  //               .openOn(map);
+  //         }
+  //       } else {
+  //         console.log(`Error getting featureInfo (status: ${xhr.status})`);
+  //       }
+  //     }
+  //   };
+  // });
 
 dawa('searchContainer', map);
 
@@ -132,10 +132,10 @@ const getTicket = function getTicket(callback) {
   };
 };
 
-const nirasTiles = function nirasTiles(ticket, config, addToGroup) {
+const nirasTiles = function nirasTiles(ticket, layerName) {
   const tiles = L.tileLayer('http://81.236.57.77/Telnetmap_TileService/GetTile.ashx?' +
       `Ticket=${ticket}&` +
-      `LayerName=${config.name}&` +
+      `LayerName=${layerName}&` +
       'Level={z}&' +
       'X={x}&' +
       'Y={y}',
@@ -146,9 +146,6 @@ const nirasTiles = function nirasTiles(ticket, config, addToGroup) {
     },
   );
 
-  if (config.default && config.default === true) { tiles.addTo(map); }
-
-  addToGroup.addLayer(tiles);
   return tiles;
 };
 
@@ -156,28 +153,93 @@ const nirasTiles = function nirasTiles(ticket, config, addToGroup) {
 getTicket((err, reply) => {
   if (err) { throw Error(err); }
   if (_config.layerGroups.length !== 0) {
-    const layerGroup = L.layerGroup();
+    const layerGroup = L.layerGroup().addTo(map);
+
+    L.Control.CustomControl = L.Control.extend({
+      onAdd() {
+        const control = L.DomUtil.create('div');
+        control.classList.add('customControl');
+
+        return control;
+      },
+    });
+
+    const customControl = new L.Control.CustomControl({
+      position: 'topright',
+    }).addTo(map);
+
+    const container = customControl.getContainer();
+    container.classList.add('legend');
 
     for (let i = 0; i < _config.layerGroups.length; i += 1) {
-      const customControl = L.control.layers({}, {}, {
-        collapsed: false,
-        position: 'topright',
-      }).addTo(map);
-      const container = customControl.getContainer();
-      container.classList.add('customControl');
+      const groupContainer = document.createElement('div');
+      groupContainer.classList.add('legendGroupContainer');
       const curr = _config.layerGroups[i];
+      if (curr.defaultOpen) {
+        groupContainer.classList.add('open');
+      } else {
+        groupContainer.style.maxHeight = `${28}px`;
+      }
       const heading = document.createElement('h4');
       heading.innerHTML = curr.layername;
-      heading.classList.add('layerHeading');
-      container.prepend(heading);
+      heading.classList.add('legendHeading');
+      groupContainer.appendChild(heading);
 
       for (let j = 0; j < curr.layers.length; j += 1) {
-        const img = (curr.layers[j].image !== null) ?
-          `<img src="${curr.layers[j].image}" alt="${curr.layers[j].text}" class="layerImg"/>` : '';
-        customControl.addBaseLayer(
-          nirasTiles(reply, curr.layers[j], layerGroup), `${img}  ${curr.layers[j].text}`);
+        const legendElement = document.createElement('div');
+        const legendImage = document.createElement('IMG');
+        const legendText = document.createElement('p');
+        const layer = nirasTiles(reply, curr.layers[j].name);
+
+        if (curr.layers[j].default) {
+          layerGroup.addLayer(layer);
+          legendElement.classList.add('selected');
+        }
+
+        legendElement.classList.add('legendElement');
+        legendElement.addEventListener('click', () => {
+          if (!legendElement.classList.contains('selected')) {
+            const selected = document.querySelectorAll('.selected,.legendElement');
+            for (let w = 0; w < selected.length; w += 1) {
+              selected[w].classList.remove('selected');
+            }
+            legendElement.classList.add('selected');
+            layerGroup.eachLayer((oldLayer) => {
+              layerGroup.removeLayer(oldLayer);
+            });
+            layerGroup.addLayer(layer);
+            layer.setOpacity(0.5);
+            layerGroup.setZIndex(201);
+          }
+        });
+        legendImage.src = (curr.layers[j].image) ? curr.layers[j].image : 'css/images/Transparent.png';
+        legendImage.alt = curr.layers[j].text;
+        legendImage.classList.add('legendImage');
+        legendText.classList.add('legendText');
+        legendText.innerHTML = curr.layers[j].text;
+
+        legendElement.appendChild(legendImage);
+        legendElement.appendChild(legendText);
+        groupContainer.appendChild(legendElement);
       }
+
+      container.appendChild(groupContainer);
+
+      if (curr.defaultOpen) {
+        groupContainer.style.maxHeight = `${groupContainer.offsetHeight}px`;
+      }
+
+      heading.addEventListener('click', () => {
+        if (groupContainer.classList.contains('open')) {
+          groupContainer.style.maxHeight = `${28}px`;
+          groupContainer.classList.remove('open');
+        } else {
+          groupContainer.style.maxHeight = `${groupContainer.scrollHeight}px`;
+          groupContainer.classList.add('open');
+        }
+      });
     }
+
     layerGroup.setZIndex(201);
     layerGroup.eachLayer((layer) => {
       layer.setOpacity(0.5);

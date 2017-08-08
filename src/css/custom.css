@@ -109,19 +109,58 @@ td.table-title{
   color: whitesmoke;
 }
 
-.customControl{
-  width: 180px;
-  margin-bottom: -20px;
+.legend{
+  border-radius: 2px;
+  background: #1e2028;
+  color: whitesmoke;
+  padding: 10px;
+}
+
+.legendHeading{
+  margin: 0;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.legendGroupContainer{
+  overflow: hidden;
+  transition: max-height 0.25s ease-in-out;
+}
+
+.legendElement{
+  background: #2d2f37;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  cursor: pointer;
+  padding-left: 10px;
+  margin-left: -10px;
+  padding-right: 10px;
+  margin-right: -10px;
+}
+
+.legendElement.selected{
+  background: rgba(62, 153, 66, 0.9);
+}
+
+.legendElement:hover {
+  background: rgba(78, 120, 140, 0.9);
+}
+
+.legendImage{
+  margin: 0;
+}
+
+.legendText{
+  margin: 0;
+  padding-left: 10px;
 }
 
 .layerHeading{
   margin: 0;
   padding-left: 4px;
   padding-bottom: 2px;
-}
-
-.layerImg{
-  margin-bottom: -2px;
 }
 
 #container{
