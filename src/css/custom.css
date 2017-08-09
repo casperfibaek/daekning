@@ -109,11 +109,22 @@ td.table-title{
   color: whitesmoke;
 }
 
+.updateMessage{
+  pointer-events: none;
+  z-index: 1001;
+}
+
 .legend{
   border-radius: 2px;
   background: #1e2028;
   color: whitesmoke;
   padding: 10px;
+  z-index: 1001;
+}
+
+.legendGroupContainer{
+  overflow: hidden;
+  transition: max-height 0.25s ease-in-out;
 }
 
 .legendHeading{
@@ -122,9 +133,8 @@ td.table-title{
   cursor: pointer;
 }
 
-.legendGroupContainer{
-  overflow: hidden;
-  transition: max-height 0.25s ease-in-out;
+.legendGroupContainer:first-of-type > .legendHeading{
+  margin-top: 2px;
 }
 
 .legendElement{
@@ -141,10 +151,10 @@ td.table-title{
 }
 
 .legendElement.selected{
-  background: rgba(62, 153, 66, 0.9);
+  background: rgba(65, 128, 206, 0.9);
 }
 
-.legendElement:hover {
+.legendElement:hover:not(.selected) {
   background: rgba(78, 120, 140, 0.9);
 }
 
