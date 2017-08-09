@@ -116,10 +116,13 @@ td.table-title{
 
 .legend{
   border-radius: 2px;
-  background: #1e2028;
+  /*background: #1e2028;*/
+  /*background-image: linear-gradient( 135deg, #FFAA85 10%, #B3315F 100%);*/
+  background-image: linear-gradient( 135deg, rgba(255, 170, 133, 0.95) 10%, rgba(179, 49, 95, 0.95) 100%);
   color: whitesmoke;
   padding: 10px;
   z-index: 1001;
+  width: 180px;
 }
 
 .legendGroupContainer{
@@ -127,22 +130,16 @@ td.table-title{
   transition: max-height 0.25s ease-in-out;
 }
 
-.legendHeading{
-  margin: 0;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
 .legendGroupContainer:first-of-type > .legendHeading{
   margin-top: 2px;
 }
 
 .legendElement{
-  background: #2d2f37;
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: space-between;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 3px;
+  padding-bottom: 4px;
   cursor: pointer;
   padding-left: 10px;
   margin-left: -10px;
@@ -151,20 +148,37 @@ td.table-title{
 }
 
 .legendElement.selected{
-  background: rgba(65, 128, 206, 0.9);
+  background: rgba(220, 216, 58, 0.5);
+  color: #49494a;
+  font-weight: 600;
 }
 
-.legendElement:hover:not(.selected) {
-  background: rgba(78, 120, 140, 0.9);
+.legendElement:hover:not(.selected),
+.legendHeading:hover{
+  background: rgba(0, 173, 255, 0.25);
 }
+
+.legendHeading{
+  margin: 0;
+  margin-top: 10px;
+  padding-left: 6px;
+  cursor: pointer;
+  border-bottom: 1px solid white;
+}
+
+/*.legendHeading:hover{
+  background: rgba(78, 120, 140, 0.9);
+}*/
 
 .legendImage{
   margin: 0;
+  padding-left: 6px;
 }
 
 .legendText{
   margin: 0;
   padding-left: 10px;
+  padding-right: 6px;
 }
 
 .layerHeading{
@@ -176,4 +190,27 @@ td.table-title{
 #container{
   display: flex;
   justify-content: center;
+}
+
+.opacityControl{
+  height: 6px;
+  width: 200px;
+  /*background: #1e2028; */
+  background-image: linear-gradient( 135deg, rgba(255, 170, 133, 0.9) 10%, rgba(179, 49, 95, 0.9) 100%);
+}
+
+.circleSelector{
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -3px;
+  margin-left: -6px;
+  /*cursor: pointer;*/
+  cursor: w-resize;
+  position: absolute;
+  left: 100px;
+  background-image: linear-gradient( 135deg, rgba(255, 248, 134, 1) 10%, rgba(240, 114, 182, 1) 100%);
+  /*background: rgba(65, 128, 206, 0.95);*/
+  /*border: 1px solid rgb(78, 120, 140);*/
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.4) !important;
 }

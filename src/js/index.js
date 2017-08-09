@@ -5,24 +5,27 @@
 const map = L.map('map', {
   zoomControl: false,
   doubleClickZoom: false,
-  maxZoom: 17,
+  maxZoom: 16,
   minZoom: 7,
 })
 .setView([56.17919, 10.53588], 7);
 
 // First we add the basemaps.
 L.control.layers({
-  OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+  Baggroundskort: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 16,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }),
-  'OpenStreetMap BW': L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+  'Baggroundskort sort/hvid': L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+    maxZoom: 16,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map),
   Flyfoto: L.tileLayer.wms('https://kortforsyningen.kms.dk/service?servicename=orto_foraar&client=QGIS&request=GetCapabilities&service=WMS&version=1.1.1&LOGIN=qgisdk&PASSWORD=qgisdk', {
-    maxZoom: 19,
+    maxZoom: 16,
     layers: 'orto_foraar',
+  }),
+  'Flyfoto sort/hvid': L.tileLayer.wms('http://services.nirasmap.niras.dk/kortinfo/services/Wms.ashx?Site=NirasInternKort&Page=KI-Basis&Service=WMS&Version=1.1.1&service=WMS&layers=B346&format=image/png&srs=EPSG:3857&Request=getmap', {
+    maxZoom: 16,
   }),
 },
   /* --- Overlays --- */
@@ -146,7 +149,6 @@ const nirasTiles = function nirasTiles(ticket, layerName) {
   return tiles;
 };
 
-
 getTicket((err, reply) => {
   if (err) { throw Error(err); }
   if (_config.layerGroups.length !== 0) {
@@ -205,8 +207,8 @@ getTicket((err, reply) => {
               layerGroup.removeLayer(oldLayer);
             });
             layerGroup.addLayer(layer);
-            layer.setOpacity(0.5);
             layerGroup.setZIndex(201);
+            layer.setOpacity(0.5);
           }
         });
         legendImage.src = (curr.layers[j].image) ? curr.layers[j].image : 'css/images/Transparent.png';
@@ -240,9 +242,60 @@ getTicket((err, reply) => {
       });
     }
 
-    layerGroup.setZIndex(201);
-    layerGroup.eachLayer((layer) => {
-      layer.setOpacity(0.5);
+    L.Control.OpacityControl = L.Control.extend({
+      onAdd() {
+        const control = L.DomUtil.create('div');
+        return control;
+      },
     });
+
+    const opacityControl = new L.Control.OpacityControl({
+      position: 'topright',
+    }).addTo(map);
+
+    const opacityContainer = opacityControl.getContainer();
+    L.DomEvent.disableClickPropagation(opacityContainer);
+    opacityContainer.classList.add('opacityControl');
+    const circleSelector = document.createElement('div');
+    circleSelector.classList.add('circleSelector');
+    opacityContainer.appendChild(circleSelector);
+
+    let initalOffset = parseFloat(window.getComputedStyle(circleSelector).left);
+    let startClientX = circleSelector.getBoundingClientRect().left - initalOffset;
+
+    function windowResized() {
+      initalOffset = parseFloat(window.getComputedStyle(circleSelector).left);
+      startClientX = circleSelector.getBoundingClientRect().left - initalOffset;
+    }
+
+    let timeoutCounter;
+    window.onresize = function onresize() {
+      clearTimeout(timeoutCounter);
+      timeoutCounter = setTimeout(windowResized, 200);
+    };
+
+    function log(e) {
+      event.preventDefault();
+      event.stopPropagation();
+      const newPosition = e.clientX;
+      const difference = newPosition - startClientX;
+      let move = difference;
+      if (move > 200) { move = 200; } else if (move < 0) { move = 0; }
+      circleSelector.style.left = `${move}px`;
+      layerGroup.eachLayer((layer) => {
+        layer.setOpacity(move / 200);
+      });
+    }
+    function rem() {
+      document.removeEventListener('mousemove', log);
+      document.removeEventListener('mouseup', rem);
+    }
+    circleSelector.addEventListener('mousedown', () => {
+      document.addEventListener('mousemove', log);
+      document.addEventListener('mouseup', rem);
+    });
+
+    layerGroup.setZIndex(201);
+    layerGroup.eachLayer((layer) => { layer.setOpacity(0.5); });
   }
 });
