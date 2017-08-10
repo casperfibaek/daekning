@@ -26,14 +26,21 @@ module.exports = function build(grunt) {
         stripBanners: true,
       },
       dist: {
-        src: ['temp/config.js', 'temp/dawa.js', 'temp/index.js'],
+        src: [
+          'temp/dawa.js',
+          'temp/config.js',
+          'temp/niras.js',
+          'temp/layerControl.js',
+          'temp/opacityControl.js',
+          'temp/index.js',
+        ],
         dest: 'build/js/app.js',
       },
     },
     uglify: {
       options: {
         mangle: {
-          reserved: ['init', '_config', 'map', 'L', 'dawa'],
+          reserved: ['init', 'config', 'map', 'L', 'dawa', 'layerControl', 'opacityControl', 'niras'],
         },
       },
       my_target: {
@@ -49,8 +56,11 @@ module.exports = function build(grunt) {
       },
       target: {
         files: {
-          'build/css/app.min.css': ['build/css/leaflet.css',
-            'build/css/dawa.css', 'build/css/custom.css'],
+          'build/css/app.min.css': [
+            'build/css/leaflet.css',
+            'build/css/dawa.css',
+            'build/css/custom.css',
+          ],
         },
       },
     },

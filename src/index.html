@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="Danish">
 	<head>
-	<title>Telia</title>
-  <meta charset="UTF-8">
-	<link rel="shortcut icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/app.min.css" />
-  <script src="js/leaflet.min.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  	<title>Telia</title>
+    <meta charset="UTF-8">
+  	<link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/mobileFirst.css" />
+    <link rel="stylesheet" href="css/dawa.css" />
 	</head>
+
 	<body>
-    <div id="container">
-        <div id="searchContainer"></div>
-		    <div id="map"></div>
+    <div id="searchContainer">
+        <div id="searchBar"></div>
     </div>
-    <script src="js/app.min.js"></script>
+    <div id="map"></div>
+  	<script src="js/leaflet.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/niras.js"></script>
+    <script src="js/dawa.js"></script>
+    <script src="js/layerControl.js"></script>
+    <script src="js/opacityControl.js"></script>
+    <script src="js/index.js"></script>
+    <noscript>JavaScript is required for rendering the map.</noscript>
 	</body>
 </html>

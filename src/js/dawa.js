@@ -1,13 +1,12 @@
 /* eslint-env browser, es6 */
 /* global L */
-/* eslint-disable no-console */
 
 const dawa = (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
   // possible themes: postnumre, vejnavne
   // adgangsadresser, kommuner, supplerendebynavne
 
-  const _config = {
+  const options = {
     themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
     replies: 3,
     style: {
@@ -246,7 +245,7 @@ const dawa = (function dawa() { // eslint-disable-line
     }
   }
 
-  function init(div, map, config = _config) {
+  function init(map, div) {
     if (map && L) {
       const searchContainer = document.getElementById(div);
       const resultList = document.createElement('ul');
@@ -263,10 +262,10 @@ const dawa = (function dawa() { // eslint-disable-line
         clearMap(map);
         if (searchInput.value.length > 2) {
           searchTimeout = setTimeout(() => {
-            search(searchInput.value, config.themes, resultList, (e) => {
+            search(searchInput.value, options.themes, resultList, (e) => {
               const target = e.target.attributes;
-              addGeom(target.type.value, target.externalID.value, resultList, map, config.style);
-            }, config.replies);
+              addGeom(target.type.value, target.externalID.value, resultList, map, options.style);
+            }, options.replies);
           }, 500);
         }
       });

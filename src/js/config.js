@@ -1,6 +1,12 @@
 /* eslint-disable */
-const _config = {
-	opdateret: 'August 2017', // dato for sidste opdatering af data
+const config = {
+	opdateret: 'August 2017',
+  connections: {
+    ticket: 'http://daekning.telia.dk/TelNetMap_Main_Tile/Default/GenerateTicket',
+    tiles: 'http://81.236.57.77/Telnetmap_TileService/GetTile.ashx?',
+    feature: 'http://daekning.telia.dk/TelNetMap_Main_Tile/Default/GetWmsFeatureInfo?wmsUrl=',
+    featureOptions: 'http://81.236.57.77/telnetmap_ext_services/kortinfo/Services/WMS.ashx?page=TeleWMS&Site=TS_DK&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=16549&BBOX=',
+  },
   layerGroups: [
     {
       layername: 'Datahastighed - Udendørs',
