@@ -1,6 +1,5 @@
-/* global L config dawa opacityControl layerControl */
+/* global L config niras dawa opacityControl layerControl */
 /* eslint-env browser, es6 */
-/* eslint-disable */
 
 const map = L.map('map', {
   zoomControl: false,
@@ -20,7 +19,7 @@ L.control.layers({
     maxZoom: 16,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map),
-  Flyfoto: L.tileLayer.wms('https://kortforsyningen.kms.dk/service?servicename=orto_foraar&client=QGIS&request=GetCapabilities&service=WMS&version=1.1.1&LOGIN=qgisdk&PASSWORD=qgisdk', {
+  Flyfoto: L.tileLayer.wms('https://kortforsyningen.kms.dk/service?servicename=orto_foraar&client=QGIS&request=GetCapabilities&service=WMS&version=1.1.1&LOGIN=NirasINMA&PASSWORD=75utag55', {
     maxZoom: 16,
     layers: 'orto_foraar',
   }),
@@ -57,7 +56,7 @@ new L.Control.UpdateMsg({
 
 map
   .on('click', (e) => {
-    niras.getFeatureInfo(e, function(err, table) {
+    niras.getFeatureInfo(e, (err, table) => {
       if (err) { throw Error(err); }
       if (table) {
         L.popup()
@@ -65,7 +64,7 @@ map
         .setContent(table)
         .openOn(map);
       }
-    }, config)
+    }, config);
   });
 
 niras.getTicket((err, ticket) => {
@@ -76,7 +75,6 @@ niras.getTicket((err, ticket) => {
     layerControl(map, layerGroup, config, ticket, niras.getTiles);
     opacityControl(map, layerGroup);
 
-    layerGroup.setZIndex(201);
-    // layerGroup.eachLayer((layer) => { layer.setOpacity(0.5); });
+    layerGroup.setZIndex(201); // leaflet fix
   }
 }, config);

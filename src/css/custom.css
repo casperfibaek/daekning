@@ -172,7 +172,6 @@ td.table-title{
   margin-right: -10px;
   padding-left: 10px;
   padding-right: 10px;
-  transition: background 0.075s ease-in-out;
 }
 
 .legendElement.selected{
@@ -183,6 +182,7 @@ td.table-title{
 
 
 .legendElement:hover:not(.selected),
+.legendHeading:hover:not(.open),
 .legendHeading.open{
   background: rgba(0, 173, 255, 0.25);
 }
@@ -193,7 +193,6 @@ td.table-title{
   padding-left: 6px;
   cursor: pointer;
   border-bottom: 1px solid white;
-  transition: background 0.075s ease-in-out;
 }
 
 .legendImage{
