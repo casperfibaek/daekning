@@ -1,6 +1,10 @@
 /* eslint-env browser, es6 */
 /* global L */
 
+/*
+  Change it from reading the DOM tree to a javascript object with a return F.
+*/
+
 const opacityControl = (function opacity(map, layerGroup, size = 200) { // eslint-disable-line
   L.Control.OpacityControl = L.Control.extend({
     onAdd() {
@@ -51,22 +55,28 @@ const opacityControl = (function opacity(map, layerGroup, size = 200) { // eslin
     });
   }
 
-  function removeMouse() {
-    document.removeEventListener('mousemove', changePosition);
-    document.removeEventListener('mouseup', removeMouse);
+  function refresh() {
+    layerGroup.eachLayer((layer) => {
+      layer.setOpacity(
+        parseFloat(window.getComputedStyle(circleSelector).left) / size);
+    });
   }
 
-  function removeTouch() {
+  map.on('layeradd', () => { refresh(); });
+
+  function remove() {
+    document.removeEventListener('mousemove', changePosition);
+    document.removeEventListener('mouseup', remove);
     document.removeEventListener('touchmove', changePosition);
-    document.removeEventListener('touchend', removeTouch);
+    document.removeEventListener('touchend', remove);
   }
 
   function clickchangePosition(e) {
     changePosition(e, 'clicked');
     document.addEventListener('mousemove', changePosition);
     document.addEventListener('touchmove', changePosition);
-    document.addEventListener('touchend', removeTouch);
-    document.addEventListener('mouseup', removeMouse);
+    document.addEventListener('touchend', remove);
+    document.addEventListener('mouseup', remove);
   }
 
   opacityContainer.addEventListener('mousedown', clickchangePosition);
@@ -74,13 +84,14 @@ const opacityControl = (function opacity(map, layerGroup, size = 200) { // eslin
 
   circleSelector.addEventListener('mousedown', () => {
     document.addEventListener('mousemove', changePosition);
-    document.addEventListener('mouseup', removeMouse);
+    document.addEventListener('mouseup', remove);
   });
 
   circleSelector.addEventListener('touchstart', () => {
     document.addEventListener('touchmove', changePosition);
-    document.addEventListener('touchend', removeTouch);
+    document.addEventListener('touchend', remove);
   });
 
+  refresh();
   return opacityControl;
 });

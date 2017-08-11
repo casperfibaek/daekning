@@ -132,6 +132,18 @@ td.table-title{
   margin-bottom: 10px;
 }
 
+.leaflet-touch .leaflet-control-layers {
+  border: 0 !important;
+}
+
+.leaflet-control-layers-base > label{
+  cursor: pointer;
+}
+
+.leaflet-control-layers-base > label:hover{
+  background: rgba(0, 173, 255, 0.25);
+}
+
 .legend{
   border-radius: 2px;
   background: rgba(46, 49, 59, 0.95);
@@ -160,6 +172,7 @@ td.table-title{
   margin-right: -10px;
   padding-left: 10px;
   padding-right: 10px;
+  transition: background 0.075s ease-in-out;
 }
 
 .legendElement.selected{
@@ -168,8 +181,9 @@ td.table-title{
   font-weight: 600;
 }
 
+
 .legendElement:hover:not(.selected),
-.legendHeading:hover:not(.selected){
+.legendHeading.open{
   background: rgba(0, 173, 255, 0.25);
 }
 
@@ -179,6 +193,7 @@ td.table-title{
   padding-left: 6px;
   cursor: pointer;
   border-bottom: 1px solid white;
+  transition: background 0.075s ease-in-out;
 }
 
 .legendImage{

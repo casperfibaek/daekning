@@ -111,24 +111,29 @@ const dawa = (function dawa() { // eslint-disable-line
       throw new Error('Error getting geometry.');
     };
 
+    /*
+      TODO: Rewrite the XML Dom parser to just parse the coordinates.
+    */
+
     xhr.onreadystatechange = function onreadystatechange() {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          const parser = new DOMParser();
           try {
-            const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
-            const polygons = xmlDoc.getElementsByTagName('kms:geometri');
+            const text = xhr.responseText.split('gml:coordinates>');
             const polygonsGeo = [];
+            const polygons = [];
+            for (let i = 1; i < text.length; i += 2) {
+              polygons.push(text[i]);
+            }
+            polygons[polygons.length - 1] =
+              polygons[polygons.length - 1].slice(0, -2);
 
             for (let j = 0; j < polygons.length; j += 1) {
               const thisHolder = [];
-              const thisPolygon = polygons[j]
-                .getElementsByTagName('gml:coordinates')[0]
-                .innerHTML
-                .split(' ');
-              for (let i = 0; i < thisPolygon.length; i += 1) {
-                const coords = thisPolygon[i].split(',').splice(0, 2).reverse();
-                thisHolder.push([Number(coords[0]), Number(coords[1])]);
+              const thisPolygon = polygons[j].split(' ');
+              for (let w = 0; w < thisPolygon.length; w += 1) {
+                const coords = thisPolygon[w].split(',');
+                thisHolder.push([Number(coords[1]), Number(coords[0])]);
               }
               polygonsGeo.push(thisHolder);
             }

@@ -22,14 +22,17 @@ const layerControl = (function layerControl(map, layerGroup, config, ticket, til
     const groupContainer = document.createElement('div');
     groupContainer.classList.add('legendGroupContainer');
     const curr = config.layerGroups[i];
-    if (curr.defaultOpen) {
-      groupContainer.classList.add('open');
-    } else {
-      groupContainer.style.maxHeight = `${28}px`;
-    }
     const heading = document.createElement('h4');
     heading.innerHTML = curr.layername;
     heading.classList.add('legendHeading');
+
+    if (curr.defaultOpen) {
+      groupContainer.classList.add('open');
+      heading.classList.add('open');
+    } else {
+      groupContainer.style.maxHeight = `${28}px`;
+    }
+
     groupContainer.appendChild(heading);
 
     for (let j = 0; j < curr.layers.length; j += 1) {
@@ -56,7 +59,6 @@ const layerControl = (function layerControl(map, layerGroup, config, ticket, til
           });
           layerGroup.addLayer(layer);
           layerGroup.setZIndex(201);
-          layer.setOpacity(0.5);
         }
       });
       legendImage.src = (curr.layers[j].image) ? curr.layers[j].image : 'css/images/Transparent.png';
@@ -82,10 +84,12 @@ const layerControl = (function layerControl(map, layerGroup, config, ticket, til
         const headingMargin = Number(headingStyle.marginTop.substring(0,
           headingStyle.marginTop.length - 2));
         groupContainer.style.maxHeight = `${18 + headingMargin}px`;
+        heading.classList.remove('open');
         groupContainer.classList.remove('open');
       } else {
         groupContainer.style.maxHeight = `${groupContainer.scrollHeight}px`;
         groupContainer.classList.add('open');
+        heading.classList.add('open');
       }
     });
   }

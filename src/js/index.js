@@ -59,10 +59,12 @@ map
   .on('click', (e) => {
     niras.getFeatureInfo(e, function(err, table) {
       if (err) { throw Error(err); }
-      L.popup()
-      .setLatLng(e.latlng)
-      .setContent(table)
-      .openOn(map);
+      if (table) {
+        L.popup()
+        .setLatLng(e.latlng)
+        .setContent(table)
+        .openOn(map);
+      }
     }, config)
   });
 
@@ -75,6 +77,6 @@ niras.getTicket((err, ticket) => {
     opacityControl(map, layerGroup);
 
     layerGroup.setZIndex(201);
-    layerGroup.eachLayer((layer) => { layer.setOpacity(0.5); });
+    // layerGroup.eachLayer((layer) => { layer.setOpacity(0.5); });
   }
 }, config);
