@@ -97,7 +97,7 @@ module.exports = function build(grunt) {
   grunt.loadNpmTasks('grunt-rename-util');
 
   grunt.registerTask('telia',
-  ['copy', 'babel', 'concat:telia', 'uglify', 'cssmin', 'clean:telia', 'rename:telia']);
+  ['copy', 'babel', 'concat:telia', 'uglify', 'cssmin', 'clean']);
   grunt.registerTask('tdc',
   ['copy', 'babel', 'concat:tdc', 'uglify', 'cssmin', 'clean']);
 };

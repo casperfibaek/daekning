@@ -256,7 +256,7 @@ const dawa = (function dawa() { // eslint-disable-line
       const resultList = document.createElement('ul');
       const searchInput = document.createElement('input');
       resultList.id = 'resultsHolder';
-      searchInput.type = 'text';
+      searchInput.type = 'search';
       searchInput.className = 'search-input';
       searchInput.setAttribute('aria-label', 'search');
       searchInput.placeholder = 'Søg efter adresser, kommuner mm.';

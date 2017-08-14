@@ -146,6 +146,19 @@ const config = {
           image: 'css/images/tdc/Speed_30_50Mbit.png',
         },
       ],
-    }
+    },
+    {
+      layername: 'Drift',
+      layers: [{
+          name: 'affected_open',
+          text: 'Aktuelle fejl',
+          image: 'css/images/tdc/Speed_200_500Mbit.png',
+        },{
+          name: 'affected_closed',
+          text: 'Løste fejl',
+          image: 'css/images/tdc/loestefejl.png',
+        },
+      ],
+    },
   ],
 };

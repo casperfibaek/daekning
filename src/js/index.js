@@ -9,20 +9,6 @@ const map = L.map('map', {
 })
 .setView([56.23, 11.25], 7);
 
-const labels = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-  subdomains: 'abcd',
-  maxZoom: 19,
-});
-labels.setZIndex(300);
-
-const base = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-  subdomains: 'abcd',
-  maxZoom: 19,
-});
-base.setZIndex(150);
-
 L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
   subdomains: 'abcd',
@@ -34,6 +20,7 @@ L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png'
   subdomains: 'abcd',
   maxZoom: 19,
 }).addTo(map).setZIndex(400);
+
 // First we add the basemaps.
 L.control.layers({
   Baggroundskort: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -52,10 +39,6 @@ L.control.layers({
     maxZoom: 16,
   }),
 }, {}, { collapsed: true, position: 'topleft' }).addTo(map);
-
-// L.control.zoom({
-//   position: 'bottomright',
-// }).addTo(map);
 
 L.control.scale({
   position: 'bottomleft',
