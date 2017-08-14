@@ -21,14 +21,29 @@ module.exports = function build(grunt) {
       },
     },
     concat: {
-      options: {
-        separator: ';',
-        stripBanners: true,
-      },
-      dist: {
+      telia: {
+        options: {
+          separator: ';',
+          stripBanners: true,
+        },
         src: [
           'temp/dawa.js',
-          'temp/config.js',
+          'temp/config_telia.js',
+          'temp/niras.js',
+          'temp/layerControl.js',
+          'temp/opacityControl.js',
+          'temp/index.js',
+        ],
+        dest: 'build/js/app.js',
+      },
+      tdc: {
+        options: {
+          separator: ';',
+          stripBanners: true,
+        },
+        src: [
+          'temp/dawa.js',
+          'temp/config_tdc.js',
           'temp/niras.js',
           'temp/layerControl.js',
           'temp/opacityControl.js',
@@ -66,6 +81,7 @@ module.exports = function build(grunt) {
     },
     clean: {
       folder: ['temp', 'build/js/dawa'],
+      test: ['build/index_test.html'],
       js: ['build/js/*.js', '!build/js/*.min.js'],
       css: ['build/css/*.css', '!build/css/*.min.css'],
     },
@@ -78,8 +94,10 @@ module.exports = function build(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-rename-util');
 
-  // Default task(s).
-  grunt.registerTask('test', ['copy']);
-  grunt.registerTask('default', ['copy', 'babel', 'concat', 'uglify', 'cssmin', 'clean']);
+  grunt.registerTask('telia',
+  ['copy', 'babel', 'concat:telia', 'uglify', 'cssmin', 'clean:telia', 'rename:telia']);
+  grunt.registerTask('tdc',
+  ['copy', 'babel', 'concat:tdc', 'uglify', 'cssmin', 'clean']);
 };
