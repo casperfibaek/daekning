@@ -5,8 +5,8 @@ const config = {
     ticket: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GenerateTicket',
     tiles: 'http://192.66.38.54/TileService/GetTile.ashx?',
     feature: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GetWmsFeatureInfo?wmsUrl=',
-    featureOptions: 'http://localhost/tdcnetmap_ext_services/kortinfo/services/WMS.ashx?page=TeleWMS&Site=TDCMOBIL&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=99&BBOX=',
-  },
+    featureOptions:  'http://localhost/tdcnetmap_ext_services/kortinfo/services/WMS.ashx?page=TeleWMS&Site=TDCMOBIL&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=99&BBOX=',
+  }, // 99
   layerGroups: [
     {
       layername: 'Datahastighed - Udendørs',

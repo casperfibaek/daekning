@@ -36,6 +36,7 @@ const niras = { // eslint-disable-line
     const url =
       `${config.connections.feature
       }${encodeURIComponent(config.connections.featureOptions)}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
+    console.log(url);
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url);

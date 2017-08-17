@@ -1,5 +1,5 @@
 /* eslint-env browser, es6 */
-/* global L */
+/* globals L */
 
 const dawa = (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
