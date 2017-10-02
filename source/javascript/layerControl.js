@@ -1,7 +1,7 @@
 /* eslint-env browser, es6 */
 /* global L */
 
-const layerControl = (function layerControl(map, layerGroup, config, ticket, tileFunction) { // eslint-disable-line
+export default (function layerControl(map, layerGroup, config, ticket, tileFunction) { // eslint-disable-line
   L.Control.CustomControl = L.Control.extend({
     onAdd() {
       const control = L.DomUtil.create('div');
@@ -37,7 +37,7 @@ const layerControl = (function layerControl(map, layerGroup, config, ticket, til
 
     for (let j = 0; j < curr.layers.length; j += 1) {
       const legendElement = document.createElement('div');
-      const legendImage = document.createElement('IMG');
+      const legendColor = document.createElement('div');
       const legendText = document.createElement('p');
       const layer = tileFunction(ticket, curr.layers[j].name, config);
 
@@ -61,13 +61,13 @@ const layerControl = (function layerControl(map, layerGroup, config, ticket, til
           layerGroup.setZIndex(201);
         }
       });
-      legendImage.src = (curr.layers[j].image) ? curr.layers[j].image : 'css/images/Transparent.png';
-      legendImage.alt = curr.layers[j].text;
-      legendImage.classList.add('legendImage');
+      legendColor.style.background = curr.layers[j].color;
+      legendColor.classList.add('legendColor');
       legendText.classList.add('legendText');
       legendText.innerHTML = curr.layers[j].text;
 
-      legendElement.appendChild(legendImage);
+      // legendElement.appendChild(legendImage);
+      legendElement.appendChild(legendColor);
       legendElement.appendChild(legendText);
       groupContainer.appendChild(legendElement);
     }

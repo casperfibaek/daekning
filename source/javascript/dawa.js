@@ -1,12 +1,12 @@
 /* eslint-env browser, es6 */
 /* globals L */
 
-const dawa = (function dawa() { // eslint-disable-line
+export default (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
   // possible themes: postnumre, vejnavne
   // adgangsadresser, kommuner, supplerendebynavne
-  // add ranking of results. 
-  
+  // add ranking of results.
+
   const options = {
     themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
     replies: 3,

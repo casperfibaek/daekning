@@ -5,7 +5,7 @@
   Change it from reading the DOM tree to a javascript object with a return F.
 */
 
-const opacityControl = (function opacity(map, layerGroup, size = 200) { // eslint-disable-line
+export default (function opacity(map, layerGroup, size = 200) { // eslint-disable-line
   L.Control.OpacityControl = L.Control.extend({
     onAdd() {
       const control = L.DomUtil.create('div');
@@ -93,5 +93,4 @@ const opacityControl = (function opacity(map, layerGroup, size = 200) { // eslin
   });
 
   refresh();
-  return opacityControl;
 });

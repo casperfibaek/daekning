@@ -1,6 +1,6 @@
 /* eslint-env browser, es6 */
 /* global L */
-const niras = { // eslint-disable-line
+export default { // eslint-disable-line
   getTicket(callback, config) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', config.connections.ticket);
@@ -17,16 +17,16 @@ const niras = { // eslint-disable-line
   },
   getTiles(ticket, layerName, config) {
     const tiles = L.tileLayer(`${config.connections.tiles
-        }Ticket=${ticket}&` +
+    }Ticket=${ticket}&` +
         `LayerName=${layerName}&` +
         'Level={z}&' +
         'X={x}&' +
         'Y={y}',
-      {
-        maxZoom: 19,
-        maxNativeZoom: 14,
-        minZoom: 7,
-      },
+    {
+      maxZoom: 19,
+      maxNativeZoom: 14,
+      minZoom: 7,
+    },
     );
     return tiles;
   },
@@ -36,7 +36,6 @@ const niras = { // eslint-disable-line
     const url =
       `${config.connections.feature
       }${encodeURIComponent(config.connections.featureOptions)}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
-    console.log(url);
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url);
