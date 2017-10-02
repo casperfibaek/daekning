@@ -5,7 +5,7 @@ import '../stylesheets/dawa.css';
 import '../stylesheets/custom.css';
 /* eslint-enable import/no-unresolved */
 
-import leaflet from './leaflet.min';
+import leaflet from './leaflet';
 import config from './config';
 import niras from './niras';
 import dawa from './dawa';

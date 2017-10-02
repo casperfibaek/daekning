@@ -101,15 +101,15 @@ export default {
         },{
           name: '4G_outdoor_Maptiler',
           text: '4G Udenfor',
-          color: 'rgba(181, 130, 132, 1)',
+          color: 'rgba(12, 66, 151, 0.5)',
         },{
           name: '3G_outdoor_Maptiler',
           text: '3G Udenfor',
-          color: 'rgba(224, 151, 151, 1)',
+          color: 'rgba(102, 173, 211, 0.5)',
         },{
           name: '2G_outdoor_Maptiler',
           text: '2G Udenfor',
-          color: 'rgba(253, 236, 182, 1)',
+          color: 'rgba(161, 219, 247, 0.5)',
         },
       ],
     },
@@ -122,15 +122,15 @@ export default {
         },{
           name: '4G_outdoor_Maptiler',
           text: '4G Indenfor',
-          color: 'rgba(181, 130, 132, 1)',
+          color: 'rgba(12, 66, 151, 0.5)',
         },{
           name: '3G_outdoor_Maptiler',
           text: '3G Indenfor',
-          color: 'rgba(224, 151, 151, 1)',
+          color: 'rgba(102, 173, 211, 0.5)',
         },{
           name: '2G_outdoor_Maptiler',
           text: '2G Indenfor',
-          color: 'rgba(253, 236, 182, 1)',
+          color: 'rgba(161, 219, 247, 0.5)',
         },
       ],
     },
@@ -139,11 +139,11 @@ export default {
       layers: [{
           name: 'tele_outdoor_tale',
           text: 'Telefon udenfor',
-          color: 'rgba(224, 151, 151, 1)',
+          color: 'rgba(126, 167, 68, 0.5)',
         },{
           name: 'tele_indoor_tale',
           text: 'Telefon indenfor',
-          color: 'rgba(224, 151, 151, 1)',
+          color: 'rgba(126, 167, 68, 0.5)',
         },
       ],
     },
@@ -152,7 +152,7 @@ export default {
       layers: [{
           name: 'affected_open',
           text: 'Aktuelle fejl',
-          color: 'rgba(181, 130, 132, 1)',
+          color: 'rgba(251, 207, 62, 0.5)',
         },{
           name: 'affected_closed',
           text: 'Løste fejl',

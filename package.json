@@ -27,7 +27,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --progress --colors",
-	"build": "webpack",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
