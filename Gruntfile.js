@@ -4,7 +4,12 @@ module.exports = function build(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     copy: {
       main: {
-        files: [{ expand: true, src: '**', cwd: 'src/', dest: 'build/' }] },
+        files: [{
+          expand: true,
+          src: '**',
+          cwd: './src/',
+          dest: './build/',
+        }] },
     },
     babel: {
       options: {
@@ -13,38 +18,23 @@ module.exports = function build(grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: 'build/js/',
-          src: ['**/*.js'],
-          dest: 'temp/',
+          cwd: './build/js/',
+          src: ['*.js'],
+          dest: './temp/',
           ext: '.js',
         }],
       },
     },
     concat: {
-      telia: {
-        options: {
-          separator: ';',
-          stripBanners: true,
-        },
-        src: [
-          'temp/dawa.js',
-          'temp/config_telia.js',
-          'temp/niras.js',
-          'temp/layerControl.js',
-          'temp/opacityControl.js',
-          'temp/index.js',
-        ],
-        dest: 'build/js/app.js',
-      },
       tdc: {
         options: {
           separator: ';',
           stripBanners: true,
         },
         src: [
-          'temp/dawa.js',
-          'temp/config_tdc.js',
+          'temp/config.js',
           'temp/niras.js',
+          'temp/dawa.js',
           'temp/layerControl.js',
           'temp/opacityControl.js',
           'temp/index.js',
@@ -55,7 +45,16 @@ module.exports = function build(grunt) {
     uglify: {
       options: {
         mangle: {
-          reserved: ['init', 'config', 'map', 'L', 'dawa', 'layerControl', 'opacityControl', 'niras'],
+          reserved: [
+            'init',
+            'config',
+            'map',
+            'L',
+            'dawa',
+            'layerControl',
+            'opacityControl',
+            'niras',
+          ],
         },
       },
       my_target: {
@@ -81,7 +80,7 @@ module.exports = function build(grunt) {
     },
     clean: {
       folder: ['temp', 'build/js/dawa'],
-      test: ['build/index_test.html'],
+      html: ['build/index_test.html'],
       js: ['build/js/*.js', '!build/js/*.min.js'],
       css: ['build/css/*.css', '!build/css/*.min.css'],
     },
@@ -96,8 +95,13 @@ module.exports = function build(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-rename-util');
 
-  grunt.registerTask('telia',
-  ['copy', 'babel', 'concat:telia', 'uglify', 'cssmin', 'clean']);
-  grunt.registerTask('tdc',
-  ['copy', 'babel', 'concat:tdc', 'uglify', 'cssmin', 'clean']);
+  grunt.registerTask('default',
+    [
+      'copy',
+      'babel',
+      'concat:tdc',
+      'uglify',
+      'cssmin',
+      'clean',
+    ]);
 };

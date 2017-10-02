@@ -7,7 +7,7 @@ const map = L.map('map', {
   maxZoom: 16,
   minZoom: 7,
 })
-.setView([56.23, 11.25], 7);
+  .setView([56.23, 11.25], 7);
 
 L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
@@ -68,9 +68,9 @@ map
       if (err) { throw Error(err); }
       if (table) {
         L.popup()
-        .setLatLng(e.latlng)
-        .setContent(table)
-        .openOn(map);
+          .setLatLng(e.latlng)
+          .setContent(table)
+          .openOn(map);
       }
     }, config);
   });

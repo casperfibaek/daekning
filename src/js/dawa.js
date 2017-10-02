@@ -5,7 +5,8 @@ const dawa = (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
   // possible themes: postnumre, vejnavne
   // adgangsadresser, kommuner, supplerendebynavne
-
+  // add ranking of results. 
+  
   const options = {
     themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
     replies: 3,

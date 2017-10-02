@@ -2,11 +2,16 @@
   "name": "daekningskort_telia",
   "version": "0.0.2",
   "description": "An interactive map showing the current cellular network coverage",
-  "main": "index.html",
+  "main": "src/index.html",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/casperfibaek/daekning.git"
+  },
   "scripts": {
     "build": "grunt"
   },
-  "author": "",
+  "author": "NIRAS A/S @ Casper Fibæk",
   "license": "ISC",
   "devDependencies": {
     "babel-preset-env": "^1.6.0",
