@@ -1,10 +1,8 @@
 /* eslint-env browser */
-/* eslint-disable import/no-unresolved */
+/* eslint-disable no-console */
 import '../stylesheets/leaflet.css';
 import '../stylesheets/dawa.css';
 import '../stylesheets/custom.css';
-/* eslint-enable import/no-unresolved */
-
 import leaflet from './leaflet';
 import config from './config';
 import niras from './niras';
@@ -50,32 +48,37 @@ leaflet.Control.UpdateMsg = leaflet.Control.extend({
   },
 });
 
-new leaflet.Control.UpdateMsg({
-  position: 'bottomleft',
-})
-  .addTo(map);
+new leaflet.Control.UpdateMsg({ position: 'bottomleft' }).addTo(map);
 
-map
-  .on('click', (e) => {
-    niras.getFeatureInfo(e, (err, table) => {
-      if (err) { throw Error(err); }
-      if (table) {
-        leaflet.popup()
-          .setLatLng(e.latlng)
-          .setContent(table)
-          .openOn(map);
-      }
-    }, config);
-  });
-
-niras.getTicket((err, ticket) => {
-  if (err) { throw Error(err); }
-  if (config.layerGroups.length !== 0) {
+(async () => {
+  try {
+    const ticket = await niras.getTicket();
     const layerGroup = leaflet.layerGroup().addTo(map);
     dawa(map, 'searchBar', 200);
-    layerControl(map, layerGroup, config, ticket, niras.getTiles);
+    layerControl(map, layerGroup, ticket);
     opacityControl(map, layerGroup);
+    map.on('click', async (event) => {
+      let query;
+      layerGroup.eachLayer((layer) => {
+        const url = layer._url;
+        const layerName = url.split('LayerName=')[1].split('&')[0];
 
-    layerGroup.setZIndex(201); // leaflet fix
+        config.layerGroups.forEach((group) => {
+          group.layers.forEach((_layer) => {
+            if (_layer.name === layerName) { query = _layer.query; }
+          });
+        });
+      });
+
+      const info = await niras.getFeatureInfo(event, query);
+      if (info.length > 0) {
+        leaflet.popup()
+          .setLatLng(event.latlng)
+          .setContent(info)
+          .openOn(map);
+      }
+    });
+  } catch (err) {
+    console.error(err);
   }
-}, config);
+})();

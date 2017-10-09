@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-env browser, es6 */
 /* globals L */
+
+import ajax from './xhrWrap';
 
 export default (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
@@ -17,77 +20,94 @@ export default (function dawa() { // eslint-disable-line
     },
   };
 
-  function getHits(theme, searchString, callback, replies = 3) {
-    const url = `http://dawa.aws.dk/${theme}/autocomplete?q=${searchString}` +
-        `&noformat&per_side=${replies}`;
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.open('GET', url); xhr.send(null);
-    xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          try {
-            const reply = JSON.parse(xhr.responseText);
-            if (reply.length === 0) {
-              callback(false, false);
-            } else {
-              callback(false, reply);
-            }
-          } catch (err) {
-            callback('Error parsing DAWA JSON!', err);
-          }
-        } else {
-          callback(`Autocomplete routine @${url} replied: ${xhr.status}`);
-        }
-      }
+  function parseGML(gml, tag = 'gml:coordinates') {
+    const geojson = {
+      type: 'FeatureCollection',
+      features: [],
     };
+
+    const split = gml.split(tag);
+
+    for (let i = 1; i < split.length; i += 2) {
+      const coords = [];
+
+      const sliced = split[i].slice(1, -2);
+      sliced.split(' ').forEach((xyz) => {
+        const xy = xyz.split(',').slice(0, -1);
+        coords.push([Number(xy[1]), Number(xy[0])]);
+      });
+
+      geojson.features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [coords],
+        },
+      });
+    }
+
+    return geojson;
   }
 
-  function search(searchTerm, themes, resultList, onClick, replies = 3) {
-    for (let i = 0; i < themes.length; i += 1) {
-      getHits(themes[i], searchTerm, (err, reply) => {
-        if (err) { throw Error(err); }
-        if (reply) {
-          for (let j = 0; j < reply.length; j += 1) {
+  async function getHits(theme, searchTerm, maxReplies = 3) {
+    const url = `http://dawa.aws.dk/${theme}/autocomplete?q=${searchTerm}&noformat&per_side=${maxReplies}`;
+    try {
+      const hits = await ajax(url);
+      return JSON.parse(hits);
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  async function search(searchTerm, themes, resultList, onClick, replies = 3) {
+    themes.forEach((theme) => {
+      getHits(theme, searchTerm, replies)
+        .then((hits) => {
+          hits.forEach((hit) => {
             const resultText = document.createElement('p');
             const resultIcon = document.createElement('p');
             const result = document.createElement('li');
             result.className = 'result';
-            result.setAttribute('type', themes[i]);
+            result.setAttribute('type', theme);
             resultText.className = 'resultText';
             resultIcon.className = 'resultIcon';
 
-            if (themes[i] === 'postnumre') {
-              result.setAttribute('externalID', reply[j].postnummer.nr);
-              resultText.innerHTML = `${reply[j].postnummer.navn}, ${reply[j].postnummer.nr}`;
-              resultIcon.innerHTML = '..Postnummer';
-            } else if (themes[i] === 'adgangsadresser') {
-              resultText.innerHTML = reply[j].tekst;
-              result.setAttribute('externalID', reply[j].adgangsadresse.href);
-              resultIcon.innerHTML = '..Adresse';
-            } else if (themes[i] === 'kommuner') {
-              resultText.innerHTML = reply[j].kommune.navn;
-              result.setAttribute('externalID', reply[j].kommune.kode);
-              resultIcon.innerHTML = '..Kommune';
-            } else if (themes[i] === 'supplerendebynavne') {
-              result.setAttribute('externalID',
-                reply[j].supplerendebynavn.href);
-              resultIcon.innerHTML = '..Bynavn';
-              resultText.innerHTML = reply[j].supplerendebynavn.navn;
+            switch (theme) {
+              case 'postnumre':
+                result.setAttribute('externalID', hit.postnummer.nr);
+                resultText.innerHTML = `${hit.postnummer.navn}, ${hit.postnummer.nr}`;
+                resultIcon.innerHTML = '..Postnummer';
+                break;
+              case 'adgangsadresser':
+                result.setAttribute('externalID', hit.adgangsadresse.href);
+                resultText.innerHTML = hit.tekst;
+                resultIcon.innerHTML = '..Adresse';
+                break;
+              case 'kommuner':
+                result.setAttribute('externalID', hit.kommune.kode);
+                resultText.innerHTML = hit.kommune.navn;
+                resultIcon.innerHTML = '..Kommune';
+                break;
+              case 'supplerendebynavne':
+                result.setAttribute('externalID', hit.supplerendebynavn.href);
+                resultText.innerHTML = hit.supplerendebynavn.navn;
+                resultIcon.innerHTML = '..Bynavn';
+                break;
+              default:
+                console.error('Reply did not match predefined themes');
             }
 
             result.appendChild(resultText);
             result.appendChild(resultIcon);
             result.addEventListener('click', onClick);
             resultList.appendChild(result);
-          }
-        }
-      }, replies);
-    }
+          });
+        })
+        .catch(err => console.error(err));
+    });
   }
 
-  function getGeom(typeName, propertyName, property, callback) {
+  async function getGeom(typeName, propertyName, property) {
     const url = 'https://services.kortforsyningen.dk/service?' +
     'servicename=dagi_gml2&' +
     'request=GetFeature&' +
@@ -106,63 +126,12 @@ export default (function dawa() { // eslint-disable-line
       '</And>' +
     '</Filter>';
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url); xhr.send(null);
-    xhr.onerror = function onerror() {
-      throw new Error('Error getting geometry.');
-    };
-
-    /*
-      TODO: Rewrite the XML Dom parser to just parse the coordinates.
-    */
-
-    xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          try {
-            const text = xhr.responseText.split('gml:coordinates>');
-            const polygonsGeo = [];
-            const polygons = [];
-            for (let i = 1; i < text.length; i += 2) {
-              polygons.push(text[i]);
-            }
-            polygons[polygons.length - 1] =
-              polygons[polygons.length - 1].slice(0, -2);
-
-            for (let j = 0; j < polygons.length; j += 1) {
-              const thisHolder = [];
-              const thisPolygon = polygons[j].split(' ');
-              for (let w = 0; w < thisPolygon.length; w += 1) {
-                const coords = thisPolygon[w].split(',');
-                thisHolder.push([Number(coords[1]), Number(coords[0])]);
-              }
-              polygonsGeo.push(thisHolder);
-            }
-
-            const geojson = {
-              type: 'FeatureCollection',
-              features: [],
-            };
-
-            for (let w = 0; w < polygonsGeo.length; w += 1) {
-              geojson.features.push({
-                type: 'Feature',
-                geometry: {
-                  type: 'Polygon',
-                  coordinates: [polygonsGeo[w]],
-                },
-              });
-            }
-
-            callback(false, geojson);
-          } catch (err) {
-            callback('Error parsing geometry from kortforsyningen.');
-          }
-        } else {
-          callback(`Error getting featureInfo (status: ${xhr.status})`);
-        }
-      }
-    };
+    try {
+      const geomGML = await ajax(url);
+      return parseGML(geomGML);
+    } catch (err) {
+      return err;
+    }
   }
 
   function leafletAdd(map, geom, style) {
@@ -196,58 +165,40 @@ export default (function dawa() { // eslint-disable-line
     });
   }
 
-  function addGeom(type, externalID, resultList, map, style) {
-    if (type === 'kommuner') {
-      getGeom('KOMMUNE2000', 'CPR_noegle', externalID, (err, reply) => {
-        if (err) { throw Error(err); }
-        leafletAdd(map, reply, style);
-        clearChildren(resultList);
-      });
-    } else if (type === 'postnumre') {
-      getGeom('POSTDISTRIKT2000', 'PostCodeToID', externalID, (err, reply) => {
-        if (err) { throw Error(err); }
-        leafletAdd(map, reply, style);
-        clearChildren(resultList);
-      });
-    } else if (type === 'adgangsadresser') {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', externalID); xhr.send(null);
-      xhr.onerror = function onerror() { throw new Error('Error getting address information.'); };
-      xhr.onreadystatechange = function onreadystatechange() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            try {
-              const reply = JSON.parse(xhr.responseText);
-              leafletAddCoords(map, reply, style);
-              clearChildren(resultList);
-            } catch (err) { throw Error('Error parsing DAWA JSON.'); }
-          } else {
-            throw Error(`${externalID} replied: ${xhr.status}`);
-          }
+  async function addGeom(type, externalID, resultList, map, style) {
+    try {
+      switch (type) {
+        case 'kommuner': {
+          const geom = await getGeom('KOMMUNE2000', 'CPR_noegle', externalID);
+          leafletAdd(map, geom, style);
+          clearChildren(resultList);
+          break;
         }
-      };
-    } else if (type === 'supplerendebynavne') {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', externalID); xhr.send(null);
-      xhr.onreadystatechange = function onreadystatechange() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            try {
-              const reply = JSON.parse(xhr.responseText);
-              const postCode = reply.postnumre[0].nr;
-              getGeom('POSTDISTRIKT2000', 'PostCodeToID', postCode, (err, secondReply) => {
-                if (err) { throw Error(err); }
-                leafletAdd(map, secondReply, style);
-                clearChildren(resultList);
-              });
-            } catch (err) { throw Error('Error parsing DAWA JSON.'); }
-          } else {
-            throw Error(`${externalID} replied: ${xhr.status}`);
-          }
+        case 'postnumre': {
+          const geom = await getGeom('POSTDISTRIKT2000', 'PostCodeToID', externalID);
+          leafletAdd(map, geom, style);
+          clearChildren(resultList);
+          break;
         }
-      };
-    } else {
-      throw Error('Could not understand request.');
+        case 'adgangsadresser': {
+          const geom = await ajax(externalID);
+          leafletAddCoords(map, JSON.parse(geom), style);
+          clearChildren(resultList);
+          break;
+        }
+        case 'supplerendebynavne': {
+          const navn = await ajax(externalID);
+          const postCode = navn.postnumre[0].nr;
+          const geom = await getGeom('POSTDISTRIKT2000', 'PostCodeToID', postCode);
+          leafletAdd(map, JSON.parse(geom), style);
+          clearChildren(resultList);
+          break;
+        }
+        default:
+          break;
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -269,12 +220,21 @@ export default (function dawa() { // eslint-disable-line
         if (searchInput.value.length > 2) {
           searchTimeout = setTimeout(() => {
             search(searchInput.value, options.themes, resultList, (e) => {
-              const target = e.target.attributes;
-              addGeom(target.type.value, target.externalID.value, resultList, map, options.style);
+              const target = e.target;
+              const attributes = target.attributes;
+              searchInput.value = target.firstChild.innerHTML;
+              addGeom(
+                attributes.type.value,
+                attributes.externalID.value,
+                resultList,
+                map,
+                options.style,
+              );
             }, options.replies);
           }, 500);
         }
       });
+      searchInput.addEventListener('focus', (event) => { console.log(event); });
       searchContainer.appendChild(searchInput);
       searchContainer.appendChild(resultList);
 

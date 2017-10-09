@@ -1,71 +1,63 @@
 /* eslint-env browser, es6 */
 /* global L */
+import ajax from './xhrWrap';
+import config from './config';
+
 export default { // eslint-disable-line
-  getTicket(callback, config) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', config.connections.ticket);
-    xhr.send(null);
-    xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          callback(false, xhr.responseText.replace(/"/g, ''));
-        } else {
-          callback(`Error getting ticket (status: ${xhr.status})`);
-        }
-      }
-    };
+  getTicket: async function getTicket() {
+    try {
+      const ticket = await ajax(config.connections.ticket);
+      return ticket.replace(/"/g, '');
+    } catch (err) {
+      return Error(err);
+    }
   },
-  getTiles(ticket, layerName, config) {
-    const tiles = L.tileLayer(`${config.connections.tiles
-    }Ticket=${ticket}&` +
+
+  getTiles(ticket, layerName) {
+    const tiles = L.tileLayer(
+      `${config.connections.tiles}Ticket=${ticket}&` +
         `LayerName=${layerName}&` +
         'Level={z}&' +
         'X={x}&' +
         'Y={y}',
-    {
-      maxZoom: 19,
-      maxNativeZoom: 14,
-      minZoom: 7,
-    },
+      {
+        maxZoom: 19,
+        maxNativeZoom: 14,
+        minZoom: 7,
+      },
     );
     return tiles;
   },
-  getFeatureInfo(e, callback, config) {
-    const lat = e.latlng.lat;
-    const lng = e.latlng.lng;
+
+  getFeatureInfo: async function getFeatureInfo(event, queryLayer) {
+    const lat = event.latlng.lat;
+    const lng = event.latlng.lng;
     const url =
       `${config.connections.feature
-      }${encodeURIComponent(config.connections.featureOptions)}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
+      }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.send(null);
+    try {
+      const info = await ajax(url);
+      const infoArray = JSON.parse(info);
 
-    xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            if (response.length > 1) {
-              let table = '<table>';
+      let table = '';
 
-              for (let i = 0; i < response.length; i += 1) {
-                table += '<tr>';
-                table += `<td class="table-title">${response[i].split(':')[0]}</td>`;
-                table += `<td>${response[i].split(':')[1]}</td>`;
-                table += '</tr>';
-              }
+      if (infoArray.length > 0) {
+        table += '<table>';
 
-              table += '</table>';
-              callback(false, table);
-            } else {
-              callback(false, false); // no info.
-            }
-          } catch (err) {
-            callback(Error(`Error parsing JSON data, ${err}`));
-          }
-        }
+        infoArray.forEach((row) => {
+          table += '<tr>';
+          table += `<td class="table-title">${row.split(':')[0]}</td>`;
+          table += `<td>${row.split(':')[1]}</td>`;
+          table += '</tr>';
+        });
+
+        table += '</table>';
       }
-    };
+
+      return table;
+    } catch (err) {
+      return err;
+    }
   },
 };

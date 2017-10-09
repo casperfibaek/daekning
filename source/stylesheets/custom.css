@@ -156,7 +156,6 @@ td.table-title{
 
 .legendGroupContainer{
   overflow: hidden;
-  transition: max-height 0.25s ease-in-out;
 }
 
 .legendGroupContainer:first-of-type > .legendHeading{
@@ -238,6 +237,25 @@ td.table-title{
   border: 1px solid rgba(78, 120, 140, 0.9);
   box-shadow: 1px 2px 3px rgba(0,0,0,0.4);
 }
+
+.legendHeading.open{
+  margin-top: 10px;
+}
+
+.legendGroupContainer {
+  max-height: 28px;
+}
+
+.legendGroupContainer:first-of-type{
+  height: 20px;
+}
+
+.legendGroupContainer.open{
+  max-height: 100% !important;
+  height: auto !important;
+}
+
+
 
 @media screen and (min-width: 610px) {
   .legend{

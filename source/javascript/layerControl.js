@@ -1,7 +1,9 @@
 /* eslint-env browser, es6 */
 /* global L */
+import niras from './niras';
+import config from './config';
 
-export default (function layerControl(map, layerGroup, config, ticket, tileFunction) { // eslint-disable-line
+export default (function layerControl(map, layerGroup, ticket) { // eslint-disable-line
   L.Control.CustomControl = L.Control.extend({
     onAdd() {
       const control = L.DomUtil.create('div');
@@ -29,8 +31,6 @@ export default (function layerControl(map, layerGroup, config, ticket, tileFunct
     if (curr.defaultOpen) {
       groupContainer.classList.add('open');
       heading.classList.add('open');
-    } else {
-      groupContainer.style.maxHeight = `${28}px`;
     }
 
     groupContainer.appendChild(heading);
@@ -39,8 +39,9 @@ export default (function layerControl(map, layerGroup, config, ticket, tileFunct
       const legendElement = document.createElement('div');
       const legendColor = document.createElement('div');
       const legendText = document.createElement('p');
-      const layer = tileFunction(ticket, curr.layers[j].name, config);
+      const layer = niras.getTiles(ticket, curr.layers[j].name);
 
+      layerGroup.setZIndex(201);
       if (curr.layers[j].default) {
         layerGroup.addLayer(layer);
         legendElement.classList.add('selected');
@@ -57,6 +58,7 @@ export default (function layerControl(map, layerGroup, config, ticket, tileFunct
           layerGroup.eachLayer((oldLayer) => {
             layerGroup.removeLayer(oldLayer);
           });
+
           layerGroup.addLayer(layer);
           layerGroup.setZIndex(201);
         }
@@ -66,7 +68,6 @@ export default (function layerControl(map, layerGroup, config, ticket, tileFunct
       legendText.classList.add('legendText');
       legendText.innerHTML = curr.layers[j].text;
 
-      // legendElement.appendChild(legendImage);
       legendElement.appendChild(legendColor);
       legendElement.appendChild(legendText);
       groupContainer.appendChild(legendElement);
@@ -74,20 +75,14 @@ export default (function layerControl(map, layerGroup, config, ticket, tileFunct
 
     container.appendChild(groupContainer);
 
-    if (curr.defaultOpen) {
-      groupContainer.style.maxHeight = `${groupContainer.offsetHeight}px`;
-    }
-
     heading.addEventListener('click', () => {
       if (groupContainer.classList.contains('open')) {
-        const headingStyle = window.getComputedStyle(heading);
-        const headingMargin = Number(headingStyle.marginTop.substring(0,
-          headingStyle.marginTop.length - 2));
-        groupContainer.style.maxHeight = `${18 + headingMargin}px`;
         heading.classList.remove('open');
         groupContainer.classList.remove('open');
       } else {
-        groupContainer.style.maxHeight = `${groupContainer.scrollHeight}px`;
+        document.querySelectorAll('.open').forEach((el) => {
+          el.classList.remove('open');
+        });
         groupContainer.classList.add('open');
         heading.classList.add('open');
       }

@@ -6,7 +6,7 @@ module.exports = {
   entry: './source/javascript/index.js',
   output: {
     path: __dirname,
-    filename: './build/bundle.js',
+    filename: './build/index.js',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -16,13 +16,13 @@ module.exports = {
     }),
     new FaviconsWebpackPlugin({
       logo: './source/icons/favicon.png',
-      prefix: './build/icons-[hash]/',
+      prefix: './build/',
       emitStats: false,
       statsFilename: 'iconstats-[hash].json',
       persistentCache: true,
       inject: true,
       background: '#fff',
-      title: 'Webpack App',
+      title: 'TDC',
 
       icons: {
         android: false,
