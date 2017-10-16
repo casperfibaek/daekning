@@ -1,13 +1,13 @@
 /* eslint-env browser, es6 */
 /* global L */
 import niras from './niras';
-import config from './config';
+
+const config = window.config;
 
 export default (function layerControl(map, layerGroup, ticket) { // eslint-disable-line
   L.Control.CustomControl = L.Control.extend({
     onAdd() {
       const control = L.DomUtil.create('div');
-
       return control;
     },
   });

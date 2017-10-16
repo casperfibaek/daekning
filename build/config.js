@@ -1,5 +1,5 @@
-/* eslint-disable */
-export default {
+/* eslint-env browser */
+window.config = {
 	opdateret: 'Oktober 2017',
   connections: {
     ticket: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GenerateTicket',

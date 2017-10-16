@@ -4,11 +4,12 @@ import '../stylesheets/leaflet.css';
 import '../stylesheets/dawa.css';
 import '../stylesheets/custom.css';
 import leaflet from './leaflet';
-import config from './config';
 import niras from './niras';
 import dawa from './dawa';
 import layerControl from './layerControl';
 import opacityControl from './opacityControl';
+
+const config = window.config;
 
 const map = leaflet.map('map', {
   zoomControl: false,

@@ -1,7 +1,8 @@
-/* eslint-env browser, es6 */
+/* eslint-env browser */
 /* global L */
 import ajax from './xhrWrap';
-import config from './config';
+
+const config = window.config;
 
 export default { // eslint-disable-line
   getTicket: async function getTicket() {

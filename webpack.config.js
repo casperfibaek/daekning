@@ -63,7 +63,9 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components|leaflet)/,
+        exclude: [
+          /(node_modules|bower_components|leaflet)/,
+        ],
         use: {
           loader: 'babel-loader',
           options: {
