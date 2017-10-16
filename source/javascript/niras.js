@@ -1,8 +1,8 @@
 /* eslint-env browser */
-/* global L */
 import ajax from './xhrWrap';
 
 const config = window.config;
+const leaflet = window.L;
 
 export default { // eslint-disable-line
   getTicket: async function getTicket() {
@@ -15,7 +15,7 @@ export default { // eslint-disable-line
   },
 
   getTiles(ticket, layerName) {
-    const tiles = L.tileLayer(
+    const tiles = leaflet.tileLayer(
       `${config.connections.tiles}Ticket=${ticket}&` +
         `LayerName=${layerName}&` +
         'Level={z}&' +
@@ -30,12 +30,12 @@ export default { // eslint-disable-line
     return tiles;
   },
 
-  getFeatureInfo: async function getFeatureInfo(event, queryLayer) {
+  getFeatureInfo: async function getFeatureInfo(event, queryLayer, usage) {
     const lat = event.latlng.lat;
     const lng = event.latlng.lng;
     const url =
       `${config.connections.feature
-      }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=LTE%2CUMTS&usages=OD`;
+      }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=GSM,UMTS,LTE&usages=${usage}`;
 
     try {
       const info = await ajax(url);

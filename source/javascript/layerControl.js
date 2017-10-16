@@ -1,23 +1,23 @@
 /* eslint-env browser, es6 */
-/* global L */
 import niras from './niras';
 
 const config = window.config;
+const leaflet = window.L;
 
-export default (function layerControl(map, layerGroup, ticket) { // eslint-disable-line
-  L.Control.CustomControl = L.Control.extend({
+export default (function layerControl(map, layerGroup, ticket) {
+  leaflet.Control.CustomControl = leaflet.Control.extend({
     onAdd() {
-      const control = L.DomUtil.create('div');
+      const control = leaflet.DomUtil.create('div');
       return control;
     },
   });
 
-  const customControl = new L.Control.CustomControl({
+  const customControl = new leaflet.Control.CustomControl({
     position: 'topright',
   }).addTo(map);
 
   const container = customControl.getContainer();
-  L.DomEvent.disableClickPropagation(container);
+  leaflet.DomEvent.disableClickPropagation(container);
   container.classList.add('legend');
 
   for (let i = 0; i < config.layerGroups.length; i += 1) {
@@ -85,6 +85,9 @@ export default (function layerControl(map, layerGroup, ticket) { // eslint-disab
         });
         groupContainer.classList.add('open');
         heading.classList.add('open');
+
+        // Selects the top layer in the group. firstChild is the heading.
+        groupContainer.children[1].click();
       }
     });
   }

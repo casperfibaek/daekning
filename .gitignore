@@ -59,5 +59,4 @@ typings/
 .env
 
 # build files
-build/*
-!build/config.js
+build

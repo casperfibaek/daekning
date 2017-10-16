@@ -1,15 +1,14 @@
 /* eslint-env browser */
 /* eslint-disable no-console */
-import '../stylesheets/leaflet.css';
 import '../stylesheets/dawa.css';
 import '../stylesheets/custom.css';
-import leaflet from './leaflet';
 import niras from './niras';
 import dawa from './dawa';
 import layerControl from './layerControl';
 import opacityControl from './opacityControl';
 
 const config = window.config;
+const leaflet = window.L;
 
 const map = leaflet.map('map', {
   zoomControl: false,
@@ -53,25 +52,33 @@ new leaflet.Control.UpdateMsg({ position: 'bottomleft' }).addTo(map);
 
 (async () => {
   try {
-    const ticket = await niras.getTicket();
     const layerGroup = leaflet.layerGroup().addTo(map);
     dawa(map, 'searchBar', 200);
+    const ticket = await niras.getTicket();
     layerControl(map, layerGroup, ticket);
     opacityControl(map, layerGroup);
     map.on('click', async (event) => {
-      let query;
+      let queryLayer;
+      let usage;
       layerGroup.eachLayer((layer) => {
         const url = layer._url;
         const layerName = url.split('LayerName=')[1].split('&')[0];
 
-        config.layerGroups.forEach((group) => {
-          group.layers.forEach((_layer) => {
-            if (_layer.name === layerName) { query = _layer.query; }
-          });
-        });
+        for (let w = 0; w < config.layerGroups.length; w += 1) {
+          let found = false;
+          for (let i = 0; i < config.layerGroups[w].layers.length; i += 1) {
+            if (config.layerGroups[w].layers[i].name === layerName) {
+              queryLayer = config.layerGroups[w].layers[i].query;
+              usage = config.layerGroups[w].layers[i].usage;
+              found = true;
+              break;
+            }
+            if (found) { break; }
+          }
+        }
       });
 
-      const info = await niras.getFeatureInfo(event, query);
+      const info = await niras.getFeatureInfo(event, queryLayer, usage);
       if (info.length > 0) {
         leaflet.popup()
           .setLatLng(event.latlng)

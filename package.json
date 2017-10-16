@@ -9,27 +9,29 @@
     "url": "https://github.com/casperfibaek/daekning.git"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0"
+    "babel-runtime": "latest"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-minify-webpack-plugin": "^0.2.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "css-loader": "^0.28.7",
-    "favicons-webpack-plugin": "0.0.7",
-    "html-webpack-plugin": "^2.30.1",
-    "style-loader": "^0.18.2",
-    "url-loader": "^0.5.9",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
+    "babel-core": "latest",
+    "babel-loader": "latest",
+    "babel-minify-webpack-plugin": "latest",
+    "babel-plugin-transform-runtime": "latest",
+    "babel-preset-env": "latest",
+    "copy-webpack-plugin": "latest",
+    "css-loader": "latest",
+    "favicons-webpack-plugin": "latest",
+	"file-loader": "latest",
+    "html-webpack-plugin": "latest",
+    "style-loader": "latest",
+    "url-loader": "latest",
+    "webpack": "latest",
+    "webpack-dev-server": "latest"
   },
   "scripts": {
     "dev": "webpack-dev-server --progress --colors",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Casper Fibæk @ NIRAS",
   "license": null
 }

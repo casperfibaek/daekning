@@ -1,17 +1,24 @@
 /* eslint-disable no-console */
 /* eslint-env browser, es6 */
-/* globals L */
-
 import ajax from './xhrWrap';
+
+const leaflet = window.L;
+const config = window.config;
 
 export default (function dawa() { // eslint-disable-line
   // This is the dawa autocomplete request
-  // possible themes: postnumre, vejnavne
-  // adgangsadresser, kommuner, supplerendebynavne
-  // add ranking of results.
+  // possible themes:
+  /*
+    adgangsadresser
+    kommuner
+    postnumre
+    supplerendebynavne
+    vejnavne
+  */
+  // TODO: add ranking
 
   const options = {
-    themes: ['postnumre', 'adgangsadresser', 'kommuner', 'supplerendebynavne'],
+    themes: ['postnumre', 'adgangsadresser', 'kommuner'],
     replies: 3,
     style: {
       fillOpacity: 0,
@@ -135,7 +142,7 @@ export default (function dawa() { // eslint-disable-line
   }
 
   function leafletAdd(map, geom, style) {
-    const _geom = L.geoJSON(geom, {
+    const _geom = leaflet.geoJSON(geom, {
       style,
     });
     map.once('moveend', () => { _geom.addTo(map); });
@@ -146,13 +153,13 @@ export default (function dawa() { // eslint-disable-line
 
   function leafletAddCoords(map, geom, style) {
     const coords = geom.adgangspunkt.koordinater.reverse();
-    const _geom = L.circle(coords, {
+    const _geom = leaflet.circle(coords, {
       radius: 40,
       fillOpacity: style.fillOpacity,
       color: style.color,
     });
     map.once('moveend', () => { _geom.addTo(map); });
-    map.flyToBounds(L.latLng(coords).toBounds(40), { maxZoom: 15 });
+    map.flyToBounds(leaflet.latLng(coords).toBounds(40), { maxZoom: 15 });
   }
 
   function clearChildren(div) {
@@ -161,7 +168,7 @@ export default (function dawa() { // eslint-disable-line
 
   function clearMap(map) {
     map.eachLayer((layer) => {
-      if (layer instanceof L.Path) { map.removeLayer(layer); }
+      if (layer instanceof leaflet.Path) { map.removeLayer(layer); }
     });
   }
 
@@ -203,7 +210,7 @@ export default (function dawa() { // eslint-disable-line
   }
 
   function init(map, div) {
-    if (map && L) {
+    if (map && leaflet) {
       const searchContainer = document.getElementById(div);
       const resultList = document.createElement('ul');
       const searchInput = document.createElement('input');
@@ -234,7 +241,9 @@ export default (function dawa() { // eslint-disable-line
           }, 500);
         }
       });
-      searchInput.addEventListener('focus', (event) => { console.log(event); });
+      searchInput.addEventListener('focus', () => {
+        if (config.clearSearchOnSelect) { searchInput.value = ''; }
+      });
       searchContainer.appendChild(searchInput);
       searchContainer.appendChild(resultList);
 

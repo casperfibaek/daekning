@@ -1,6 +1,7 @@
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './source/javascript/index.js',
@@ -8,36 +9,20 @@ module.exports = {
     path: __dirname,
     filename: './build/index.js',
   },
+  context: __dirname,
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'TDC Daekningskort',
+      title: 'TDC Dækningskort',
       filename: './build/index.html',
       template: './source/index.ejs',
     }),
-    new FaviconsWebpackPlugin({
-      logo: './source/icons/favicon.png',
-      prefix: './build/',
-      emitStats: false,
-      statsFilename: 'iconstats-[hash].json',
-      persistentCache: true,
-      inject: true,
-      background: '#fff',
-      title: 'TDC',
-
-      icons: {
-        android: false,
-        appleIcon: false,
-        appleStartup: false,
-        coast: false,
-        favicons: true,
-        firefox: false,
-        opengraph: false,
-        twitter: false,
-        yandex: false,
-        windows: false,
-      },
-    }),
     new MinifyPlugin(),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, '/static'),
+        to: path.join(__dirname, 'build/static'),
+      },
+    ]),
   ],
   module: {
     loaders: [

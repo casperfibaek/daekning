@@ -1,24 +1,21 @@
 /* eslint-env browser, es6 */
-/* global L */
 
-/*
-  Change it from reading the DOM tree to a javascript object with a return F.
-*/
+const leaflet = window.L;
 
 export default (function opacity(map, layerGroup, size = 200) { // eslint-disable-line
-  L.Control.OpacityControl = L.Control.extend({
+  leaflet.Control.OpacityControl = leaflet.Control.extend({
     onAdd() {
-      const control = L.DomUtil.create('div');
+      const control = leaflet.DomUtil.create('div');
       return control;
     },
   });
 
-  const opacityControlElement = new L.Control.OpacityControl({
+  const opacityControlElement = new leaflet.Control.OpacityControl({
     position: 'topright',
   }).addTo(map);
 
   const opacityContainer = opacityControlElement.getContainer();
-  L.DomEvent.disableClickPropagation(opacityContainer);
+  leaflet.DomEvent.disableClickPropagation(opacityContainer);
   opacityContainer.classList.add('opacityControl');
   const circleSelector = document.createElement('div');
   circleSelector.classList.add('circleSelector');
