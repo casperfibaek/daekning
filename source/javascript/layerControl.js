@@ -4,6 +4,13 @@ import niras from './niras';
 const config = window.config;
 const leaflet = window.L;
 
+function removeClass(string) {
+  const el = document.querySelectorAll(`.${string}`);
+  for (let w = 0; w < el.length; w += 1) {
+    el[w].classList.remove(string);
+  }
+}
+
 export default (function layerControl(map, layerGroup, ticket) {
   leaflet.Control.CustomControl = leaflet.Control.extend({
     onAdd() {
@@ -80,9 +87,7 @@ export default (function layerControl(map, layerGroup, ticket) {
         heading.classList.remove('open');
         groupContainer.classList.remove('open');
       } else {
-        document.querySelectorAll('.open').forEach((el) => {
-          el.classList.remove('open');
-        });
+        removeClass('open');
         groupContainer.classList.add('open');
         heading.classList.add('open');
 
