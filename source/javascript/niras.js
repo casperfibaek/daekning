@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* eslint-disable prefer-destructuring, no-console */
 import ajax from './xhrWrap';
 
 const config = window.config;
@@ -33,12 +34,19 @@ export default { // eslint-disable-line
   getFeatureInfo: async function getFeatureInfo(event, queryLayer, usage) {
     const lat = event.latlng.lat;
     const lng = event.latlng.lng;
-    const url =
-      `${config.connections.feature
-      }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=GSM,UMTS,LTE&usages=${usage}`;
+
+    let url;
+    if (queryLayer === 114) {
+      url = `${config.connections.drift}${lng},${lat},${lng},${lat}`;
+    } else {
+      url =
+        `${config.connections.feature
+        }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=GSM,UMTS,LTE&usages=${usage}`;
+    }
 
     try {
       const info = await ajax(url);
+      console.log(info);
       const infoArray = JSON.parse(info);
 
       let table = '';

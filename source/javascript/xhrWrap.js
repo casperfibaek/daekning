@@ -5,16 +5,17 @@ export default async function xhrGet(url) {
 
     xhr.open('GET', url);
     xhr.send(null);
+    // xhr.withCredentials = false;
     xhr.onreadystatechange = function onreadystatechange() {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           resolve(xhr.responseText);
         } else {
-          reject(`XHR failed with statuscode: ${xhr.status}`);
+          reject(Error(`XHR failed with statuscode: ${xhr.status}`));
         }
       }
     };
 
-    xhr.onerror = (err) => { reject(err); };
+    xhr.onerror = err => reject(err);
   });
 }
