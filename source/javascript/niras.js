@@ -36,8 +36,9 @@ export default { // eslint-disable-line
     const lng = event.latlng.lng;
 
     let url;
-    if (queryLayer === 114) {
+    if (queryLayer === 668) {
       url = `${config.connections.drift}${lng},${lat},${lng},${lat}`;
+      // url = `${config.connections.drift}${lat},${lng},${lat},${lng}`;
     } else {
       url =
         `${config.connections.feature

@@ -23,7 +23,6 @@ body {
   right: 0;
 }
 
-
 .updateMessage{
   display: none;
   padding: 4px;
@@ -116,7 +115,6 @@ td.table-title{
 }
 
 .opacityControl{
-  display: none;
   height: 6px;
   width: 200px;
   background: rgba(46, 49, 59, 0.95);;
@@ -153,7 +151,43 @@ td.table-title{
   height: auto !important;
 }
 
+.leaflet-control.menu{
+  height: 42px;
+}
 
+#menu{
+  height: 44px;
+  width: 44px;
+  position: absolute;
+  background: rgba(46,49,59,.95);
+  right: 10px;
+  z-index: 10000;
+  transition: 0.075s ease-in;
+}
+
+#menu > img{
+  width: 22px;
+  color: #f5f5f5;
+  border-radius: 2px;
+  padding: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+#menu:hover{
+  background: rgba(42,42,53, 0.95);
+}
+
+#menu:active{
+  background: rgba(38,38,49, 1);
+}
+
+.display-none{
+  display: none;
+}
+.display-on{
+  display: initial;
+}
 
 @media screen and (min-width: 610px) {
   .legend{
@@ -161,7 +195,6 @@ td.table-title{
   }
 
   .leaflet-control-zoom,
-  .opacityControl,
   .updateMessage{
     display: block;
   }

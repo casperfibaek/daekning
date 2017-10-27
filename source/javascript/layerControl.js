@@ -14,8 +14,7 @@ function removeClass(string) {
 export default (function layerControl(map, layerGroup, ticket) {
   leaflet.Control.CustomControl = leaflet.Control.extend({
     onAdd() {
-      const control = leaflet.DomUtil.create('div');
-      return control;
+      return leaflet.DomUtil.create('div');
     },
   });
 

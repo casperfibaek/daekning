@@ -9,8 +9,8 @@ window.config = {
     tiles: 'http://192.66.38.54/TileService/GetTile.ashx?',
 
 
-    /* drift: 'http://localhost/tdcnetmap_ext_tst_services/kortinfo/services/WMS.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&WIDTH=1&HEIGHT=1&QUERY_LAYERS=141&x=0&y=0&info_format=text/xml&BBOX=', */
-    drift: 'http://daekning.tdc.dk/tdcnetmap_ext_tst_services/kortinfo/services/Wms.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&WIDTH=1&HEIGHT=1&QUERY_LAYERS=141&x=0&y=0&info_format=text/xml&BBOX=',
+    // drift: 'http://87.116.40.60/TdcNetMap_int_tst_services/kortinfo/services/Wms.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&query_Layers=668&Width=1&Height=1&x=0&y=0&info_format=text/xml&BBox=',
+    drift: 'http://87.116.40.60/TdcNetMap_int_tst_services/kortinfo/services/Wms.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&query_Layers=668&Width=1&Height=1&x=0&y=0&info_format=text/xml&BBox=',
 
     feature: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GetWmsFeatureInfo?wmsUrl=',
     featureOptions(queryLayer) {
@@ -225,13 +225,13 @@ window.config = {
           name: 'affected_open',
           text: 'Aktuelle fejl',
           usage: 'OD',
-          query: 114,
+          query: 668,
           color: 'rgba(251, 207, 62, 0.5)',
         }, {
           name: 'affected_closed',
           text: 'Løste fejl',
           usage: 'OD',
-          query: 114,
+          query: 668,
           color: 'rgba(126, 201, 185, 1)',
         },
       ],

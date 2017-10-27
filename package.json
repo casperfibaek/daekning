@@ -30,6 +30,7 @@
     "webpack-dev-server": "latest"
   },
   "scripts": {
+    "start": "webpack-dev-server --progress --colors",
     "dev": "webpack-dev-server --progress --colors",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"

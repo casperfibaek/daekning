@@ -18,6 +18,8 @@ const map = leaflet.map('map', {
 })
   .setView([56.23, 11.25], 7);
 
+window.map = map;
+
 leaflet.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
   subdomains: 'abcd',
@@ -50,11 +52,23 @@ leaflet.Control.UpdateMsg = leaflet.Control.extend({
 
 new leaflet.Control.UpdateMsg({ position: 'bottomleft' }).addTo(map);
 
+const menu = document.getElementById('menu');
+menu.addEventListener('click', () => {
+  const opacity = document.querySelector('.leaflet-control.opacityControl');
+  const legend = document.querySelector('.leaflet-control.legend');
+  if (opacity.classList.contains('display-none') || legend.classList.contains('display-none')) {
+    opacity.classList.remove('display-none'); legend.classList.remove('display-none');
+  } else {
+    opacity.classList.add('display-none'); legend.classList.add('display-none');
+  }
+});
+
 (async () => {
   try {
     const layerGroup = leaflet.layerGroup().addTo(map);
     dawa(map, 'searchBar', 200);
     const ticket = await niras.getTicket();
+
     layerControl(map, layerGroup, ticket);
     opacityControl(map, layerGroup);
     map.on('click', async (event) => {
