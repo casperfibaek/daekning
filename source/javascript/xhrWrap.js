@@ -5,7 +5,6 @@ export default async function xhrGet(url) {
 
     xhr.open('GET', url);
     xhr.send(null);
-    // xhr.withCredentials = false;
     xhr.onreadystatechange = function onreadystatechange() {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {

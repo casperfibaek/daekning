@@ -37,37 +37,44 @@ export default { // eslint-disable-line
 
     let url;
     if (queryLayer === 668) {
-      url = `${config.connections.drift}${lng},${lat},${lng},${lat}`;
-      // url = `${config.connections.drift}${lat},${lng},${lat},${lng}`;
+      url = `${config.connections.drift}${lng},${lat},${lng + 0.000001},${lat + 0.000001}`;
+
+      try {
+        const info = await ajax(url);
+        const tooltip = info.split('<field name="NON_TECH_INFO" type="System.String">')[1].split('</field>')[0];
+        return tooltip;
+      } catch (err) {
+        return err;
+      }
     } else {
       url =
-        `${config.connections.feature
-        }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=GSM,UMTS,LTE&usages=${usage}`;
-    }
+      `${config.connections.feature
+      }${encodeURIComponent(config.connections.featureOptions(queryLayer))}${lng},${lat},${lng},${lat}&layerType=MapTiles&systems=GSM,UMTS,LTE&usages=${usage}`;
 
-    try {
-      const info = await ajax(url);
-      console.log(info);
-      const infoArray = JSON.parse(info);
+      try {
+        const info = await ajax(url);
+        console.log(info);
+        const infoArray = JSON.parse(info);
 
-      let table = '';
+        let table = '';
 
-      if (infoArray.length > 0) {
-        table += '<table>';
+        if (infoArray.length > 0) {
+          table += '<table>';
 
-        infoArray.forEach((row) => {
-          table += '<tr>';
-          table += `<td class="table-title">${row.split(':')[0]}</td>`;
-          table += `<td>${row.split(':')[1]}</td>`;
-          table += '</tr>';
-        });
+          infoArray.forEach((row) => {
+            table += '<tr>';
+            table += `<td class="table-title">${row.split(':')[0]}</td>`;
+            table += `<td>${row.split(':')[1]}</td>`;
+            table += '</tr>';
+          });
 
-        table += '</table>';
+          table += '</table>';
+        }
+
+        return table;
+      } catch (err) {
+        return err;
       }
-
-      return table;
-    } catch (err) {
-      return err;
     }
   },
 };

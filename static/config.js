@@ -8,12 +8,12 @@ window.config = {
     ticket: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GenerateTicket',
     tiles: 'http://192.66.38.54/TileService/GetTile.ashx?',
 
-
-    // drift: 'http://87.116.40.60/TdcNetMap_int_tst_services/kortinfo/services/Wms.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&query_Layers=668&Width=1&Height=1&x=0&y=0&info_format=text/xml&BBox=',
+    // Drift lagene
     drift: 'http://87.116.40.60/TdcNetMap_int_tst_services/kortinfo/services/Wms.ashx?Site=TDCMOBIL&Page=TeleWMS&Service=WMS&Version=1.3.0&Srs=EPSG:4326&Request=getfeatureinfo&query_Layers=668&Width=1&Height=1&x=0&y=0&info_format=text/xml&BBox=',
 
+    // Alle andre lag
     feature: 'http://daekning.tdc.dk/tdcnetmap_ext_tile/Default/GetWmsFeatureInfo?wmsUrl=',
-    featureOptions(queryLayer) {
+    featureOptions: function featureOptions(queryLayer) {
       var start = 'http://localhost/tdcnetmap_ext_services/kortinfo/services/WMS.ashx?page=TeleWMS&Site=TDCMOBIL&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&WIDTH=1&HEIGHT=1&INFO_FORMAT=text/xml&X=0&Y=0&srs=EPSG:4326&QUERY_LAYERS=';
       var end = '&BBOX=';
       return start + queryLayer + end;
@@ -231,7 +231,7 @@ window.config = {
           name: 'affected_closed',
           text: 'Løste fejl',
           usage: 'OD',
-          query: 668,
+          // query: 668,
           color: 'rgba(126, 201, 185, 1)',
         },
       ],
